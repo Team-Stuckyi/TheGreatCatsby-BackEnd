@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>쿠키 테스트</h1>
+    <input type="text" id="user_input" placeholder='입력하세요' />
+    <button type='button' id='write'>쿠키 저장하기</button>
+    <button type='button' id='read'>쿠키 읽어오기</button>
+    <button type='button' id='delete'>쿠키 삭제하기</button>
+    <h2 id='console'></h2>
+
+    <script src="//cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const backendUrl = "/cookie";
+
+        /** 쿠키 저장하기 버튼 클릭 이벤트 */
+        document.getElementById("write").addEventListener('click', () => {
+            const userInput = document.getElementById("user_input").value;
+
+            // 즉시실행 비동기 처리 함수
+            (async () => {
+                try {
+                    // Ajax 요청 보내기 -> 백엔드가 전달한 결과값이 response.data에 저장된다.
+                    /**
+                    // backend가 node가 아닌 경우 post,put,delete 파라미터 전송 방법
+                    const form = new FormData();
+                    form.append('msg', userInput);
+                    const response = await axios.post(backendUrl, form);
+                    /*/
+                    // backend가 node인 경우 post, put, delete 파라미터 전송 방법
+                    const response = await axios.post(backendUrl, {msg: userInput});
+                    /**/
+                    document.getElementById("console").innerHTML = response.data;
+                } catch (error) {
+                    const errorMsg = "[" + error.response.status + "] " + error.response.statusText
+                    console.error(errorMsg);
+                }
+            })();
+        });
+
+        /** 쿠키 읽어오기 버튼 클릭 이벤트 */
+        document.getElementById("read").addEventListener('click', () => {
+            // 즉시실행 비동기 처리 함수
+            (async () => {
+                try {
+                    // Ajax 요청 보내기 -> 백엔드가 전달한 결과값이 response.data에 저장된다.
+                    const response = await axios.get(backendUrl);
+                    console.log(response.data);
+
+                    const html = "<h2>일반값: " + response.data.my_msg + "</h2><h2>암호화: " + response.data.my_msg_signed + "</h2>";
+
+                    document.getElementById("console").innerHTML = html;
+                } catch (error) {
+                    const errorMsg = "[" + error.response.status + "] " + error.response.statusText
+                    console.error(errorMsg);
+                }
+            })();
+        });
+
+        /** 쿠키 삭제하기 버튼 클릭 이벤트 */
+        document.getElementById("delete").addEventListener('click', () => {
+            // 즉시실행 비동기 처리 함수
+            (async () => {
+                try {
+                    // Ajax 요청 보내기 -> 백엔드가 전달한 결과값이 response.data에 저장된다.
+                    const response = await axios.delete(backendUrl);
+                    document.getElementById("console").innerHTML = response.data;
+                } catch (error) {
+                    const errorMsg = "[" + error.response.status + "] " + error.response.statusText
+                    console.error(errorMsg);
+                }
+            })();
+        });
+    </script>
+</body>
+</html>

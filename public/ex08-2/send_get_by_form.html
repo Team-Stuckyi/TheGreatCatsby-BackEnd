@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>백엔드에 입력양식으로 GET 파라미터 전송하기</h1>
+
+    <form method='get' action='/send_get'>
+        <div>
+            <label for='answer'><h2>100 + 200 = ?</h2> </label>
+            <input type="text" name="answer" id='answer'/>
+        </div>
+
+        <div>
+            <label for='username'><h2>Username : </h2> </label>
+            <input type="text" name="username" id='username'/>
+        </div>
+
+        <div>
+            <label for='password'><h2>Password : </h2> </label>
+            <input type="password" name="password" id='password'/>
+        </div>
+
+        <div>
+            <label for='email'><h2>Email : </h2> </label>
+            <input type="email" name="email" id='email'/>
+        </div>
+
+        <hr />
+        <button type='submit'>결과확인</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <h1>Node Login Example</h1>
+        <hr />
+
+        <form method="post" action="/session/login" id="before-login" style="display: none">
+            <div>
+                <label for="user_id">아이디</label>
+                <input type="text" name="user_id" id="user_id" />
+            </div>
+
+            <div>
+                <label for="user_pw">비밀번호</label>
+                <input type="password" name="user_pw" id="user_pw" />
+            </div>
+
+            <hr />
+
+            <button type="submit">로그인</button>
+        </form>
+
+        <div id="after-login" style="display: none">
+            <h1>안녕하세요.</h1>
+            <a href="#" id="logout-link">로그아웃</a>
+        </div>
+
+        <script src="//cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            // 페이지 로드시 로그인 여부 검사
+            (async () => {
+                try {
+                    const response = await axios.get('/session/login');
+
+                    // 백엔드에서 전달된 결과가 로그인 성공을 의미하는 경우
+                    document.getElementById('before-login').style.display = 'none';
+                    document.getElementById('after-login').style.display = 'block';
+                } catch (error) {
+                    document.getElementById('before-login').style.display = 'block';
+                    document.getElementById('after-login').style.display = 'none';
+                }
+            })();
+
+            document.getElementById('before-login').addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const user_id = document.getElementById('user_id').value;
+                const user_pw = document.getElementById('user_pw').value;
+
+                // 즉시실행 비동기 처리 함수
+                (async () => {
+                    try {
+                        // Ajax 요청 보내기 -> 백엔드가 전달한 결과값이 response.data에 저장된다.
+                        const response = await axios.post('/session/login', { id: user_id, pw: user_pw });
+
+                        // 백엔드에서 전달된 결과가 로그인 성공을 의미하는 경우
+                        document.getElementById('before-login').style.display = 'none';
+                        document.getElementById('after-login').style.display = 'block';
+                    } catch (error) {
+                        const errorMsg = '[' + error.response.status + '] ' + error.response.statusText;
+                        console.error(errorMsg);
+                        alert('로그인에 실패했습니다. 아이디나 비밀번호를 확인하세요.');
+                    }
+                })();
+            });
+
+            document.getElementById('logout-link').addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // 즉시실행 비동기 처리 함수
+                (async () => {
+                    try {
+                        // Ajax 요청 보내기 -> 백엔드가 전달한 결과값이 response.data에 저장된다.
+                        const response = await axios.delete('/session/login');
+
+                        // 백엔드에서 전달된 결과가 로그인 성공을 의미하는 경우
+                        document.getElementById('before-login').style.display = 'block';
+                        document.getElementById('after-login').style.display = 'none';
+                    } catch (error) {
+                        const errorMsg = '[' + error.response.status + '] ' + error.response.statusText;
+                        console.error(errorMsg);
+                        alert('로그아웃에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+                    }
+                })();
+            });
+        </script>
+    </body>
+</html>

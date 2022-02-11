@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            label {
+                display: block;
+                width: 150px;
+                height: 30px;
+                line-height: 40px;
+            }
+        </style>
+    </head>
+    <body>
+        <form id="mail-form" method="post" action="/send_mail">
+            <div>
+                <label for="writer_name">발송자 이름</label>
+                <input type="text" id="writer_name" name="writer_name" />
+            </div>
+            <div>
+                <label for="writer_email">발송자 메일주소</label>
+                <input type="text" id="writer_email" name="writer_email" />
+            </div>
+            <div>
+                <label for="receiver_name">수신자 이름</label>
+                <input type="text" id="receiver_name" name="receiver_name" />
+            </div>
+            <div>
+                <label for="receiver_email">수신자 메일주소</label>
+                <input type="text" id="receiver_email" name="receiver_email" />
+            </div>
+            <div>
+                <label for="subject">메일제목</label>
+                <input type="text" id="subject" name="subject" />
+            </div>
+            <div>
+                <label for="content">내용</label>
+                <textarea id="content" name="content"></textarea>
+            </div>
+            <div>
+                <button type="submit">메일발송</button>
+            </div>
+        </form>
+
+        <script src="//cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="//cdn.ckeditor.com/ckeditor5/31.1.0/classic/ckeditor.js"></script>
+        <script>
+            ClassicEditor.create(document.querySelector('#content'))
+                .then((editor) => {
+                    console.log(editor);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+
+            document.getElementById('mail-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const current = e.currentTarget;
+
+                (async () => {
+                    try {
+                        const response = await axios.post(current.action, {
+                            writer_name: document.querySelector('#writer_name').value,
+                            writer_email: document.querySelector('#writer_email').value,
+                            receiver_name: document.querySelector('#receiver_name').value,
+                            receiver_email: document.querySelector('#receiver_email').value,
+                            subject: document.querySelector('#subject').value,
+                            content: document.querySelector('#content').value,
+                        });
+                        alert('메일 발송에 성공했습니다.');
+                    } catch (error) {
+                        console.log(error);
+                        alert('에러가 발생했습니다. 관리자에게 문의 바랍니다.');
+                    }
+                })();
+            });
+        </script>
+    </body>
+</html>

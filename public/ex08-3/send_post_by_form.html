@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>백엔드에 입력양식으로 POST 파라미터 전송하기</h1>
+
+    <form name='myfrm' method='post' action='/send_post'>
+        <div>
+            <label for='username'><h2>Username : </h2> </label>
+            <input type="text" name="username" id='username'/>
+        </div>
+
+        <div>
+            <label for='email'><h2>Email : </h2> </label>
+            <input type="email" name="email" id='email'/>
+        </div>
+
+        <hr />
+        <button type='submit'>결과확인</button>
+    </form>
+</body>
+</html>

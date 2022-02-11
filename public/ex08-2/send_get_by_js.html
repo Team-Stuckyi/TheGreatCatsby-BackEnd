@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>백엔드에 입력양식으로 GET 파라미터 전송하기</h1>
+
+    <div>
+        <label id='answer'><h2>100 + 200 = ?</h2> </label>
+        <select id="dropdown">
+            <option value="">--- 선택하세요 ---</option>
+            <option value="100">백</option>
+            <option value="200">이백</option>
+            <option value="300">삼백</option>
+            <option value="400">사백</option>
+            <option value="500">오백</option>
+        </select>
+    </div>
+
+    <script>
+        document.querySelector("#dropdown").addEventListener('change', e => {
+            e.preventDefault;
+            
+            const current = e.currentTarget;
+            const choose = current[current.selectedIndex].value;
+
+            const url = "/send_get?answer=" + choose;
+            window.location.href = url;
+        });
+    </script>
+</body>
+</html>
