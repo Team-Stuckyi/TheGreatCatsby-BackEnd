@@ -164,6 +164,7 @@ app.use(
 app.use(require("./controllers/Admins.js")(app));
 app.use(require("./controllers/Orders.js")(app));
 app.use(require("./controllers/Reviews.js")(app));
+app.use(require("./controllers/Products.js")(app));
 
 // 런타임 에러가 발생한 경우에 대한 일괄 처리
 app.use((err, req, res, next) => {
