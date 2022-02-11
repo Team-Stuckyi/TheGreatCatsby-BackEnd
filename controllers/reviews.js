@@ -68,13 +68,58 @@ module.exports = (app) => {
   });
 
   /**
-   * 사용자 페이지 - 리뷰 작성 페이지
+   * 사용자 페이지 - 구매 후기 페이지
    * 리뷰를 등록하는 데이터
    * [POST] /reviewlist.html
-   * 전송 정보 : review_id, review_text, review_photo, stars, write_date, prod_id -> products -> name, user_id -> members -> name
+   * 전송 정보 : review_id, review_text, review_photo, stars, 
    */
-  //router.post("/reviewsplus/:order_id", async (req, res, next) => {
-  // 파라미터 받기
+  router.post("/reviews/write/:order_id", async (req, res, next) => {
+    // 저장을 위한 파라미터 받기
+    const review_text = req.post("review_text");
+    const review_photo = req.post("review_photo");
+    const stars = req.post("stars");
+    const write_date = req.post("write_date");
+    const order_id = req.get("order_id");
+
+    if (
+      review_text === null ||
+      review_photo === null ||
+      stars === null ||
+      write_date === null ||
+      order_id === null
+    ) {
+      return next(new Error(400));
+    }
+
+    // 데이터 저장하기
+    // 데이터 조회 결과가 저장될 빈 변수
+    let json = null;
+
+    try {
+      // 데이터베이스 접속
+      dbcon = await mysql2.createConnection(config.database);
+      await dbcon.connect();
+
+      // 데이터 저장하기
+      const sql = "INSERT INTO reviews (review_text, review_photo, stars, write_date, order_id) VALUES (?, ?, ?, ?, ?)";
+
+      const input_data = [review_text, review_photo, stars, write_date, order_id];
+      const [result1] = await dbcon.query(sql, input_data);
+
+      let sql2 = "SELECT review_text, review_photo, stars, write_date, order_id FROM reviews WHERE review_id=?";
+      const [result2] = await dbcon.query(sql2, [result1.insertId]);
+
+      // 조회 결과를 미리 준비한 변수에 저장함
+      json = result2;
+    } catch (err) {
+      return next(err);
+    } finally {
+      dbcon.end();
+    }
+
+    // 모든 처리에 성공했으므로 정상 조회 결과 구성
+    res.sendJson({ item: json });
+  });
 
   /**
    * 관리자 페이지 - 리뷰 관리 페이지
