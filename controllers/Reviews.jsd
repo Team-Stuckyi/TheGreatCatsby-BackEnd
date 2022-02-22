@@ -16,7 +16,7 @@ const mysql2 = require("mysql2/promise");
 module.exports = (app) => {
   let dbcon = null;
 
-  /**
+  /*
    * 관리자 페이지- 리뷰 관리 조회 페이지
    * 사용자 페이지 - 상품 상세페이지, 구매 후기 페이지
    * 리뷰 작성 정보를 화면에 보여주는 데이터
