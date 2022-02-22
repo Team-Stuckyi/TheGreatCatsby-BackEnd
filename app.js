@@ -35,6 +35,8 @@ const path = require('path');
  */
 // express 본체
 const express = require('express');
+// CORS 문제 해결을 위한 모듈
+const cors = require("cors");
 // 클라이언트의 정보를 조회할 수 있는 기능
 const useragent = require('express-useragent');
 // 특정 폴더의 파일을 URL로 노출 시킴
@@ -54,6 +56,9 @@ const methodOverride = require('method-override');
 // 여기서 생성한 app 객체의 use() 함수를 사용해서
 // 각종 외부기능, 설정내용, URL을 계속해서 확장하는 형태로 구현이 진행된다.
 const app = express();
+
+// CORS 문제 해결 모듈 사용 설정
+app.use(cors());
 
 /**
  * ------------------------------------------------------------
