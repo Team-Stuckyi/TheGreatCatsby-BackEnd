@@ -15,9 +15,40 @@ const utilHelper = require("../helper/UtilHelper");
 /** 라우팅 정의 부분 */
 module.exports = (app) => {
     let dbcon = null;
+    
+    /**
+    * 사용자 페이지 - 사용자 페이지 - 메인페이지
+    * 상품 정보를 화면에 보여주는 데이터
+    * [GET] /products
+    * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_id, review_count, star_avg
+    */
+    /** 전체 목록 조회 */
+    router.get('/products/main', async (req, res, next) => {
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
+
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
+
+            // 전체 데이터 수를 조회
+            let sql =
+                "SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products";
+            const [result] = await dbcon.query(sql);
+            json = result;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
+
+        res.sendJson({ item: json });
+    });
+
 
     /**
-    * 관리자 페이지 - 일반 상품 관리 페이지, 사용자 페이지 - 메인페이지
+    * 관리자 페이지 - 일반 상품 관리 페이지
     * 사용자 정보를 화면에 보여주는 데이터
     * [GET] /products
     * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_id, review_count, star_avg
