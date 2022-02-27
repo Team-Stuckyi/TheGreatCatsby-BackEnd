@@ -15,28 +15,17 @@ const utilHelper = require("../helper/UtilHelper");
 /** 라우팅 정의 부분 */
 module.exports = (app) => {
     let dbcon = null;
-    
+
     /**
     * 사용자 페이지 - 사용자 페이지 - 메인페이지
     * 상품 정보를 화면에 보여주는 데이터
-    * [GET] /products/main
+    * [GET] /products
     * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_id, review_count, star_avg
     */
     /** 전체 목록 조회 */
-    router.get("/products/main", async (req, res, next) => {
-
-        // 검색어 파라미터 받기 -> 검색어가 없을 경우 전체 목록 조회이므로 유효성검사 안함
-        const query = req.get('query');
-
-        // 현재 페이지 번호 받기 (기본값 1)
-        const page = req.get('page', 1);
-
-        // 한 페이지에 보여질 목록 수 받기 
-        const rows = req.get('rows', 20);
-
+    router.get('/products/main', async (req, res, next) => {
         // 데이터 조회 결과가 저장될 빈 변수
         let json = null;
-        let pagenation = null;
 
         try {
             // 데이터베이스 접속
@@ -44,48 +33,17 @@ module.exports = (app) => {
             await dbcon.connect();
 
             // 전체 데이터 수를 조회
-            let sql1 = 'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
-
-            let args1 = [];
-
-            if (query != null) {
-                sql1 += " WHERE prod_id LIKE concat('%', ?, '%')";
-                args1.push(query);
-            }
-
-            const [result1] = await dbcon.query(sql1, args1);
-            const totalCount = result1[0].cnt;
-
-            // 페이지 정보를 계산한다.
-            pagenation = utilHelper.pagenation(totalCount, page, rows);
-            logger.debug(JSON.stringify(pagenation));
-
-            // 데이터 조회
-            let sql2 = "SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products";
-
-            let args2 = [];
-
-            if (query != null) {
-                sql2 += " WHERE products LIKE concat('%', ?, '%')";
-                args2.push(query);
-            }
-
-            sql2 += " LIMIT ?, ?";
-            args2.push(pagenation.offset);
-            args2.push(pagenation.listCount);
-
-            const [result2] = await dbcon.query(sql2, args2);
-
-            // 조회결과를 미리 준비한 변수에 저장함
-            json = result2;
+            let sql =
+                "SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products";
+            const [result] = await dbcon.query(sql);
+            json = result;
         } catch (err) {
             return next(err);
         } finally {
             dbcon.end();
         }
 
-        // 모든 처리에 성공했으므로 정상 조회 결과 구성
-        res.sendJson({ pagenation: pagenation, item: json });
+        res.sendJson({ item: json });
     });
 
     /**
