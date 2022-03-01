@@ -130,7 +130,7 @@ module.exports = (app) => {
    * 전송 정보 : order_price, order_date, order_select, order_count, member => name, member => email, products
    */
 
-  router.post("/orders/post/:userid", async (req, res, next) => {
+  router.post("/orders/post/:user_id", async (req, res, next) => {
     //1. 상세 조회를 위한 id
     const user_id = req.get("user_id");
 
@@ -174,7 +174,7 @@ module.exports = (app) => {
 
       // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
       let sql3 =
-        "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, members.name, members.tel, members.addr1, products.name FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id";
+        "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, members.name, members.tel, members.addr1, products.name FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id WHERE orders.order_id = ?";
       const [result3] = await dbcon.query(sql3, [result1.insertId]);
 
 
