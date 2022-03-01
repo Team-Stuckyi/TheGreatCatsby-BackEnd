@@ -70,7 +70,7 @@ module.exports = (app) => {
 
             // 데이터 조회
             let sql =
-                'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
+                'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products WHERE prod_id = ?';
             const [result] = await dbcon.query(sql, [prod_id]);
             json = result;
         } catch (err) {
