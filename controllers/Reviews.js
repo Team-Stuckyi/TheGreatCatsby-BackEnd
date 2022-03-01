@@ -3,165 +3,204 @@
  */
 
 /** 모듈 참조 부분 */
-const config = require("../helper/_config");
-const logger = require("../helper/LogHelper");
-const regexHelper = require("../helper/RegexHelper");
-const utilHelper = require("../helper/UtilHelper");
-const BadRequestException = require("../exceptions/BadRequestException");
-const RuntimeException = require("../exceptions/RuntimeException");
-const PageNotFoundException = require("../exceptions/PageNotFoundException");
-const router = require("express").Router();
-const mysql2 = require("mysql2/promise");
+const config = require('../helper/_config');
+const logger = require('../helper/LogHelper');
+const regexHelper = require('../helper/RegexHelper');
+const utilHelper = require('../helper/UtilHelper');
+const BadRequestException = require('../exceptions/BadRequestException');
+const RuntimeException = require('../exceptions/RuntimeException');
+const PageNotFoundException = require('../exceptions/PageNotFoundException');
+const router = require('express').Router();
+const mysql2 = require('mysql2/promise');
 
 module.exports = (app) => {
-  let dbcon = null;
+    let dbcon = null;
 
-  /*
-   * 관리자 페이지- 리뷰 관리 조회 페이지
-   * 사용자 페이지 - 상품 상세페이지, 구매 후기 페이지
-   * 리뷰 작성 정보를 화면에 보여주는 데이터
-   * [GET]
-   * admin => reviewlist.html
-   * user => prodlist.html. review.html
-   * 전송 정보 : user_id => users => name, email , prod_id => products =>name, stars, review_text, write_date, review_photo
-   */
+    /*
+     * 관리자 페이지- 리뷰 관리 조회 페이지
+     * 사용자 페이지 - 상품 상세페이지, 구매 후기 페이지
+     * 리뷰 작성 정보를 화면에 보여주는 데이터
+     * [GET]
+     * admin => reviewlist.html
+     * user => prodlist.html. review.html
+     * 전송 정보 : user_id => users => name, email , prod_id => products =>name, stars, review_text, write_date, review_photo
+     */
 
-  router.get("/reviews/look", async (req, res, next) => {
-    //검색어 파라미터 받기 -> 검색어가 없을 경우 전체 목록 조회이므로 유효성 검사 안함
-    const query = req.get("query");
+    router.get('/reviews/look', async (req, res, next) => {
+        //검색어 파라미터 받기 -> 검색어가 없을 경우 전체 목록 조회이므로 유효성 검사 안함
+        const query = req.get('query');
 
-    //현재 페이지 번호 받기 (기본값은 1)
-    const page = req.get("page", 1);
+        //현재 페이지 번호 받기 (기본값은 1)
+        const page = req.get('page', 1);
 
-    //한 페이지에 보여질 목록 수 받기 (기본값은 10, 최소 10, 최대 30)
-    const rows = req.get("rows", 10);
-    // 데이터 조회 결과가 저장될 빈 변수
-    let json = null;
-    let pagenation = null;
+        //한 페이지에 보여질 목록 수 받기 (기본값은 10, 최소 10, 최대 30)
+        const rows = req.get('rows', 10);
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
+        let pagenation = null;
 
-    try {
-      // 데이터베이스 접속
-      dbcon = await mysql2.createConnection(config.database);
-      await dbcon.connect();
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
 
-      let sql1 =
-        "SELECT r.review_id, m.email, p.name, m.name, r.review_text, r.stars, DATE_FORMAT(r.write_date, '%Y-%m-%d') AS write_date, r.review_photo FROM reviews r LEFT JOIN orders  o ON r.order_id = o.order_id LEFT JOIN members  m ON o.user_id = m.user_id  LEFT JOIN products p ON o.prod_id = p.prod_id;";
+            let sql1 =
+                "SELECT r.review_id, m.email, p.name, m.name, r.review_text, r.stars, DATE_FORMAT(r.write_date, '%Y-%m-%d') AS write_date, r.review_photo FROM reviews r LEFT JOIN orders  o ON r.order_id = o.order_id LEFT JOIN members  m ON o.user_id = m.user_id  LEFT JOIN products p ON o.prod_id = p.prod_id;";
 
-      let args1 = [];
+            let args1 = [];
 
-      if (query != null) {
-        sql1 += " WHERE r.review_text LIKE ('%', ?, '%')";
-        args1.push(query);
-      }
+            if (query != null) {
+                sql1 += " WHERE r.review_text LIKE ('%', ?, '%')";
+                args1.push(query);
+            }
 
-      const [result1] = await dbcon.query(sql1, args1);
+            const [result1] = await dbcon.query(sql1, args1);
 
-      // 조회 결과를 미리 준비한 변수에 저장함
-      json = result1;
-    } catch (err) {
-      return next(err);
-    } finally {
-      dbcon.end();
-    }
-    // 모든 처리에 성공했으므로 정상 조회 결과 구성
-    res.sendJson({ pagenation: pagenation, item: json });
-  });
+            // 조회 결과를 미리 준비한 변수에 저장함
+            json = result1;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson({ pagenation: pagenation, item: json });
+    });
 
-  /**
-   * 사용자 페이지 - 구매 후기 페이지
-   * 리뷰를 등록하는 데이터
-   * [POST] /reviewlist.html
-   * 전송 정보 : review_id, review_text, review_photo, stars, 
-   */
-  router.post("/reviews/write", async (req, res, next) => {
-    // 저장을 위한 파라미터 받기
-    const review_text = req.post("review_text");
-    const review_photo = req.post("review_photo");
-    const stars = req.post("stars");
-    const write_date = req.post("write_date");
-    const review_id = req.post("review_id");
-    const order_id = req.post("order_id");
+    /**
+     * 사용자 페이지 - 리뷰 페이지
+     * 특정 리뷰
+     * [GET] /review/:prodId
+     * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_id, review_count, star_avg
+     */
+    /** 특정 목록 조회 */
+    router.get('/review/:proid', async (req, res, next) => {
+        const prod_id = req.get('proid');
 
-    if (
-      review_text === null ||
-      review_photo === null ||
-      stars === null ||
-      write_date === null ||
-      review_id === null ||
-      order_id === null
-    ) {
-      return next(new Error(400));
-    }
+        if (prod_id === null) {
+            return next(new Error(400));
+        }
 
-    // 데이터 저장하기
-    // 데이터 조회 결과가 저장될 빈 변수
-    let json = null;
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
 
-    try {
-      // 데이터베이스 접속
-      dbcon = await mysql2.createConnection(config.database);
-      await dbcon.connect();
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
 
-      // 데이터 저장하기
-      const sql = "INSERT INTO reviews (review_text, review_photo, stars, write_date, review_id, order_id) VALUES (?, ?, ?, ?, ?, ?)";
+            // 데이터 조회
+            let sql =
+                'SELECT r.review_id, m.email, p.name, m.name, r.review_text, r.stars, DATE_FORMAT(r.write_date, '%Y-%m-%d') AS write_date, r.review_photo FROM reviews r LEFT JOIN orders o ON r.order_id = o.order_id LEFT JOIN members  m ON o.user_id = m.user_id  LEFT JOIN products p ON o.prod_id = p.prod_id WHERE prod_id = ?';
+            const [result] = await dbcon.query(sql, [prod_id]);
+            json = result;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
 
-      const input_data = [review_text, review_photo, stars, write_date, review_id, order_id];
-      const [result1] = await dbcon.query(sql, input_data);
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson({ item: json });
+    });
 
-      let sql2 = "SELECT review_text, review_photo, stars, write_date, review_id, orders.order_id FROM reviews INNER JOIN orders ON orders.order_id = reviews.order_id";
-      const [result2] = await dbcon.query(sql2, [result1.insertId]);
+    /**
+     * 사용자 페이지 - 구매 후기 페이지
+     * 리뷰를 등록하는 데이터
+     * [POST] /reviewlist.html
+     * 전송 정보 : review_id, review_text, review_photo, stars,
+     */
+    router.post('/reviews/write', async (req, res, next) => {
+        // 저장을 위한 파라미터 받기
+        const review_text = req.post('review_text');
+        const review_photo = req.post('review_photo');
+        const stars = req.post('stars');
+        const write_date = req.post('write_date');
+        const review_id = req.post('review_id');
+        const order_id = req.post('order_id');
 
-      // 조회 결과를 미리 준비한 변수에 저장함
-      json = result2;
-    } catch (err) {
-      return next(err);
-    } finally {
-      dbcon.end();
-    }
+        if (
+            review_text === null ||
+            review_photo === null ||
+            stars === null ||
+            write_date === null ||
+            review_id === null ||
+            order_id === null
+        ) {
+            return next(new Error(400));
+        }
 
-    // 모든 처리에 성공했으므로 정상 조회 결과 구성
-    res.sendJson({ item: json });
-  });
+        // 데이터 저장하기
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
 
-  /**
-   * 관리자 페이지 - 리뷰 관리 페이지
-   * 사용자가 작성한 리뷰를 삭제
-   * [DELETE] /reviewlist.html
-   * 전송 정보
-   */
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
 
-  router.delete("/reviews/del/:review_id", async (req, res, next) => {
-    const reviewid = req.get("review_id");
+            // 데이터 저장하기
+            const sql =
+                'INSERT INTO reviews (review_text, review_photo, stars, write_date, review_id, order_id) VALUES (?, ?, ?, ?, ?, ?)';
 
-    if (reviewid === null) {
-      //  400 Bad Request -> 잘못된 요청
-      return next(new Error(400));
-    }
+            const input_data = [review_text, review_photo, stars, write_date, review_id, order_id];
+            const [result1] = await dbcon.query(sql, input_data);
 
-    /** 데이터 삭제하기 */
-    try {
-      // 데이터베이스 접속
-      dbcon = await mysql2.createConnection(config.database);
-      await dbcon.connect();
+            let sql2 =
+                'SELECT review_text, review_photo, stars, write_date, review_id, orders.order_id FROM reviews INNER JOIN orders ON orders.order_id = reviews.order_id';
+            const [result2] = await dbcon.query(sql2, [result1.insertId]);
 
-      // 데이터 삭제하기
-      const sql = "DELETE FROM reviews WHERE review_id=?";
-      const [result1] = await dbcon.query(sql, [reviewid]);
+            // 조회 결과를 미리 준비한 변수에 저장함
+            json = result2;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
 
-      console.log(result1);
-      // 결과 행 수가 0이라면 예외처리
-      if (result1.affectedRows < 1) {
-        throw new Error("삭제된 데이터가 없습니다.");
-      }
-    } catch (err) {
-      return next(err);
-    } finally {
-      dbcon.end();
-    }
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson({ item: json });
+    });
 
-    // 모든 처리에 성공했으므로 정상 조회 결과 구성
-    res.sendJson();
-  });
+    /**
+     * 관리자 페이지 - 리뷰 관리 페이지
+     * 사용자가 작성한 리뷰를 삭제
+     * [DELETE] /reviewlist.html
+     * 전송 정보
+     */
 
-  return router;
+    router.delete('/reviews/del/:review_id', async (req, res, next) => {
+        const reviewid = req.get('review_id');
+
+        if (reviewid === null) {
+            //  400 Bad Request -> 잘못된 요청
+            return next(new Error(400));
+        }
+
+        /** 데이터 삭제하기 */
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
+
+            // 데이터 삭제하기
+            const sql = 'DELETE FROM reviews WHERE review_id=?';
+            const [result1] = await dbcon.query(sql, [reviewid]);
+
+            console.log(result1);
+            // 결과 행 수가 0이라면 예외처리
+            if (result1.affectedRows < 1) {
+                throw new Error('삭제된 데이터가 없습니다.');
+            }
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
+
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson();
+    });
+
+    return router;
 };
