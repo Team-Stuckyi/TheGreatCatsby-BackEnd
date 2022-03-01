@@ -130,14 +130,18 @@ module.exports = (app) => {
    * 전송 정보 : order_price, order_date, order_select, order_count, member => name, member => email, products
    */
 
-  router.post("/orders/post", async (req, res, next) => {
+  router.post("/orders/post/:userid", async (req, res, next) => {
+    //1. 상세 조회를 위한 id
+    const user_id = req.get("user_id");
+
     // 저장을 위한 파라미터 입력받기
     const price = req.post("order_price");
     const select = req.post("order_select");
     const count = req.post("order_count");
     const prodid = req.post("prod_id");
     const userid = req.post("user_id");
-
+    const tel = req.post("tel");
+    const addr1 = req.post("addr1");
     try {
       regexHelper.value(price, "총 금액 입력이 없습니다.");
       regexHelper.value(select, "결재방식을 고르지 않았습니다.");
@@ -156,19 +160,27 @@ module.exports = (app) => {
       await dbcon.connect();
 
       // 데이터 저장하기
-      const sql =
+      const sql1 =
         "INSERT INTO `orders` (order_price, order_date, order_select, order_count, prod_id, user_id) VALUES (?, now(), ?, ?, ?, ?)";
 
-      const input_data = [price, select, count, prodid, userid];
-      const [result1] = await dbcon.query(sql, input_data);
+      const input_data1 = [price, select, count, prodid, userid];
+      const [result1] = await dbcon.query(sql1, input_data1);
+
+      const sql2 = "UPDATE `members` SET tel=?, addr1 = ? WHERE user_id = ?)";
+
+      const input_data2 = [tel, addr1, user_id];
+      const [result2] = await dbcon.query(sql2, input_data2);
+
 
       // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-      let sql2 =
-        "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, members.name, members.email, products.name FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id";
-      const [result2] = await dbcon.query(sql2, [result1.insertId]);
+      let sql3 =
+        "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, members.name, members.tel, members.addr1, products.name FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id";
+      const [result3] = await dbcon.query(sql3, [result1.insertId]);
+
+
 
       // 조회 결과를 미리 준비한 변수에 저장함
-      json = result2;
+      json = result3;
     } catch (err) {
       return next(err);
     } finally {
