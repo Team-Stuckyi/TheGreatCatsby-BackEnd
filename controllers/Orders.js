@@ -131,8 +131,6 @@ module.exports = (app) => {
    */
 
   router.post("/orders/post/:user_id", async (req, res, next) => {
-    //1. 상세 조회를 위한 id
-    const user_id = req.get("user_id");
 
     // 저장을 위한 파라미터 입력받기
     const price = req.post("order_price");
@@ -140,8 +138,6 @@ module.exports = (app) => {
     const count = req.post("order_count");
     const prodid = req.post("prod_id");
     const userid = req.post("user_id");
-    const tel = req.post("tel");
-    const addr1 = req.post("addr1");
     try {
       regexHelper.value(price, "총 금액 입력이 없습니다.");
       regexHelper.value(select, "결재방식을 고르지 않았습니다.");
@@ -166,21 +162,15 @@ module.exports = (app) => {
       const input_data1 = [price, select, count, prodid, userid];
       const [result1] = await dbcon.query(sql1, input_data1);
 
-      const sql2 = "UPDATE `members` SET tel=?, addr1 = ? WHERE user_id = ?)";
-
-      const input_data2 = [tel, addr1, user_id];
-      const [result2] = await dbcon.query(sql2, input_data2);
-
-
       // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-      let sql3 =
+      let sql2 =
         "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, members.name, members.tel, members.addr1, products.name FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id WHERE orders.order_id = ?";
-      const [result3] = await dbcon.query(sql3, [result1.insertId]);
+      const [result2] = await dbcon.query(sql2, [result1.insertId]);
 
 
 
       // 조회 결과를 미리 준비한 변수에 저장함
-      json = result3;
+      json = result2;
     } catch (err) {
       return next(err);
     } finally {
@@ -231,3 +221,49 @@ module.exports = (app) => {
 
   return router;
 };
+
+/**
+    * PayAdress 컴포넌트
+    * 주소를 수정하는 라우터
+    * [PUT] /product
+    * 전송 정보 : tel, addr1, user_id
+    */
+/** 데이터 수정 --> Update(UPDATE) */
+router.put('/orders/member/:user_id', async (req, res, next) => {
+  const user_id = req.get('user_id');
+  const tel = req.put('tel');
+  const addr1 = req.put('addr1');
+
+  if (user_id === null || tel === null || addr1 === null) {
+    return next(new Error(400));
+  }
+
+  /** 데이터 수정하기 */
+  // 데이터 조회 결과가 저장될 빈 변수
+  let json = null;
+
+  try {
+    // 데이터베이스 접속
+    dbcon = await mysql2.createConnection(config.database);
+    await dbcon.connect();
+
+    // 데이터 수정하기
+    const sql = "UPDATE members SET tel=?, addr1 = ? WHERE user_id = ?";
+    const input_data = [tel, addr1, user_id];
+    const [result1] = await dbcon.query(sql, input_data);
+
+    // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
+    const sql2 = 'SELECT members.user_id, members.tel, members.addr1 FROM orders INNER JOIN members ON orders.user_id = member.user_id WHERE orders.user_id=?';
+    const [result2] = await dbcon.query(sql2, [user_id]);
+
+    // 조회 결과를 미리 준비한 변수에 저장함
+    json = result2;
+  } catch (err) {
+    return next(err);
+  } finally {
+    dbcon.end();
+  }
+
+  // 모든 처리에 성공했으므로 정상 조회 결과 구성
+  res.sendJson({ item: json });
+});
