@@ -200,7 +200,7 @@ module.exports = (app) => {
 
   router.get("/orders/thanku/:order_id", async (req, res, next) => {
     const orderid = req.get("order_id");
-
+    /** user_id 값을 가져와서 inner join 한다 */
     if (orderid === null) {
       return next(new Error(400));
     }
@@ -215,7 +215,7 @@ module.exports = (app) => {
 
       // 데이터 조회
       const sql =
-        "SELECT order_price, order_select, order_count FROM orders WHERE order_id=?";
+        "SELECT orders.order_price, orders.order_select, orders.order_count, member.user_id FROM orders INNER JOIN members ON orders.user_id = members.user_id WHERE orders.order_id=?";
       const [result] = await dbcon.query(sql, [orderid]);
 
       // 조회 결과를 미리 준비한 변수에 저장함
