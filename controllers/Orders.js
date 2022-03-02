@@ -215,7 +215,7 @@ module.exports = (app) => {
 
       // 데이터 조회
       const sql =
-        "SELECT orders.order_price, orders.order_select, orders.order_count, members.user_id FROM orders INNER JOIN members ON orders.user_id = members.user_id WHERE orders.order_id=?";
+        "SELECT orders.order_price, orders.order_select, orders.order_count, members.user_id, members.tel, members.addr1 FROM orders INNER JOIN members ON orders.user_id = members.user_id WHERE orders.order_id=?";
       const [result] = await dbcon.query(sql, [orderid]);
 
       // 조회 결과를 미리 준비한 변수에 저장함
