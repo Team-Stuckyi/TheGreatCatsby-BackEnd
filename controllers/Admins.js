@@ -169,18 +169,55 @@ module.exports = (app) => {
     });
 
     /**
-     * 관리자 페이지 - 회원정보 수정
-     * 회원과 관련된 처리의 경우 UPDATE나 DELETE에서 사용할 WHERE의 PK값을
-     * 보안상의 이유로 별도 전송하지 않는다.
-     * 로그인을 할 경우 회원의 정보가 SESSION에 저장되어 있을 것이므로
-     * 모든 개별 회원에 대한 접근은 SESSION 데이터를 활용해야 한다.
-     * [PUT] /manageadmin
-     * 전송정보 : session으로 넘겨 처리
+     * 관리자 페이지 - 관리자 회원 관리
+     * 사용자 정보 수정
+     * [PUT] /admins/edit/:user_id
+     * 수정 정보 : email, name
      */
-    router.put("/admins/edit", async (req, res, next) => {
-        if (!req.session.memberInfo) {
-            return next(new BadRequestException("로그인 중이 아닙니다."));
+
+    router.put("/admins/edit/:user_id", async (req, res, next) => {
+        const user_id = req.get("user_id");
+        const email = req.post("email");
+        const name = req.post("name");
+
+        if (user_id === null || name === null || email === null) {
+            //  400 Bad Request -> 잘못된 요청
+            return next(new Error(400));
         }
+
+        /** 데이터 수정하기 */
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
+
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
+
+            // 데이터 수정하기
+            const sql = "UPDATE admins SET email=?, name=? WHERE user_id=?";
+            const input_data = [email, name, user_id];
+            const [result1] = await dbcon.query(sql, input_data);
+
+            // 결과 행 수가 0이라면 예외처리
+            if (result1.affectedRows < 1) {
+                throw new Error("수정된 데이터가 없습니다.");
+            }
+
+            // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
+            const sql2 = "SELECT email, name FROM admins WHERE user_id=?";
+            const [result2] = await dbcon.query(sql2, [user_id]);
+
+            // 조회 결과를 미리 준비한 변수에 저장함
+            json = result2;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
+
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson({ item: json });
     });
 
     /**
@@ -191,23 +228,20 @@ module.exports = (app) => {
      * 전송정보 : status
      */
 
-    router.delete("/admims/getout", async (req, res, next) => {
-        const email = req.delete("email");
-        const password = req.delete("password");
-        const status = req.delete("status");
+    /**
+     * 관리자 페이지 - 관리자 회원 관리
+     * [DELETE] /admims/getout/:user_id
+     * 사용자 상태 업데이트
+     */
+    router.delete("/admims/getout/:user_id", async (req, res, next) => {
+        const user_id = req.get("user_id");
 
         try {
-            regexHelper.value(email, "이메일을 입력하세요");
-            regexHelper.value(password, "비밀번호를 입력하세요");
-
             dbcon = await mysql2.createConnection(config.database);
             await dbcon.connect();
 
-            // 아이디와 비밀번호가 일치하는 데이터를 조회 (조회결과에서 비밀번호는 제외)
-
-            let sql1 =
-                "UPDATE admins SET status='N' WHERE email=? AND password=?";
-            let args1 = [email, password];
+            let sql1 = "UPDATE admins SET status='N' WHERE user_id=?";
+            let args1 = [user_id];
 
             const [result1] = await dbcon.query(sql1, args1);
 
