@@ -132,6 +132,7 @@ module.exports = (app) => {
 
   router.post("/orders/post/:user_id", async (req, res, next) => {
 
+    const user_id = req.get("user_id");
     // 저장을 위한 파라미터 입력받기
     const price = req.post("order_price");
     const select = req.post("order_select");
@@ -165,7 +166,7 @@ module.exports = (app) => {
       // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
       let sql2 =
         "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, members.name, members.tel, members.addr1, products.name FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id WHERE orders.order_id = ?";
-      const [result2] = await dbcon.query(sql2, [result1.insertId]);
+      const [result2] = await dbcon.query(sql2, [user_id]);
 
 
 
