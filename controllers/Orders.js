@@ -254,8 +254,12 @@ router.put('/orders/member/:user_id', async (req, res, next) => {
     const input_data = [tel, addr1, user_id];
     const [result1] = await dbcon.query(sql, input_data);
 
+    // 결과 행 수가 0이라면 예외처리
+    if (result1.affectedRows < 1) {
+        throw new Error('수정된 데이터가 없습니다.');
+      }
     // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-    const sql2 = 'SELECT members.user_id, members.tel, members.addr1 FROM orders INNER JOIN members ON orders.user_id = members.user_id WHERE members.user_id=?';
+    const sql2 = 'SELECT members.user_id, members.tel, members.addr1 FROM members INNER JOIN orders ON orders.user_id = members.user_id WHERE members.user_id=?';
     const [result2] = await dbcon.query(sql2, [user_id]);
 
     // 조회 결과를 미리 준비한 변수에 저장함
