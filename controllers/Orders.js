@@ -233,8 +233,8 @@ module.exports = (app) => {
 /** 데이터 수정 --> Update(UPDATE) */
 router.put('/orders/member/:user_id', async (req, res, next) => {
   const user_id = req.get('user_id');
-  const tel = req.put('tel');
-  const addr1 = req.put('addr1');
+  const tel = req.post('tel');
+  const addr1 = req.post('addr1');
 
   if (user_id === null || tel === null || addr1 === null) {
     return next(new Error(400));
