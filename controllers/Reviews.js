@@ -134,15 +134,27 @@ module.exports = (app) => {
             await dbcon.connect();
 
             // 데이터 저장하기
-            const sql =
-                'INSERT INTO reviews (review_text, review_photo, stars,  review_id, order_id, write_date) VALUES (?, ?, ?, ?, ?, now())';
+            if (review_photo === null || review_photo === undefined) {
+                const sql =
+                    'INSERT INTO reviews (review_text, stars,  review_id, order_id, write_date) VALUES (?, ?, ?, ?, now())';
 
-            const input_data = [review_text, review_photo, stars, review_id, order_id, write_date];
-            const [result1] = await dbcon.query(sql, input_data);
+                const input_data = [review_text, stars, review_id, order_id];
+                const [result1] = await dbcon.query(sql, input_data);
 
-            let sql2 =
-                "SELECT review_text, review_photo, stars, DATE_FORMAT( write_date, '%Y-%m-%d') AS write_date, review_id, orders.order_id FROM reviews INNER JOIN orders ON orders.order_id = reviews.order_id";
-            const [result2] = await dbcon.query(sql2, [result1.insertId]);
+                let sql2 =
+                    "SELECT review_text, review_photo, stars, DATE_FORMAT(write_date, '%Y-%m-%d') AS write_date, review_id, orders.order_id FROM reviews INNER JOIN orders ON orders.order_id = reviews.order_id";
+                const [result2] = await dbcon.query(sql2, [result1.insertId]);
+            } else {
+                const sql =
+                    'INSERT INTO reviews (review_text, review_photo, stars,  review_id, order_id, write_date) VALUES (?, ?, ?, ?, ?, now())';
+
+                const input_data = [review_text, review_photo, stars, review_id, order_id];
+                const [result1] = await dbcon.query(sql, input_data);
+
+                let sql2 =
+                    "SELECT review_text, review_photo, stars, DATE_FORMAT( write_date, '%Y-%m-%d') AS write_date, review_id, orders.order_id FROM reviews INNER JOIN orders ON orders.order_id = reviews.order_id";
+                const [result2] = await dbcon.query(sql2, [result1.insertId]);
+            }
 
             // 조회 결과를 미리 준비한 변수에 저장함
             json = result2;
