@@ -135,23 +135,23 @@ module.exports = (app) => {
             // 데이터 저장하기
             if (review_photo === null || review_photo === undefined) {
                 const sql =
-                    'INSERT INTO reviews (review_text, stars, order_id, write_date) VALUES (?, ?, ?, now())';
+                    'INSERT INTO reviews (order_id, review_text, stars, write_date) VALUES (?, ?, ?, now())';
 
-                const input_data = [review_text, stars, order_id];
+                const input_data = [order_id, review_text, stars];
                 const [result1] = await dbcon.query(sql, input_data);
 
                 let sql2 =
-                    "SELECT review_text, review_photo, stars, DATE_FORMAT(write_date, '%Y-%m-%d') AS write_date, review_id, orders.order_id FROM reviews INNER JOIN orders ON orders.order_id = reviews.order_id";
+                    "SELECT review_text, review_photo, stars, DATE_FORMAT(write_date, '%Y-%m-%d') AS write_date, review_id, order_id FROM reviews WHERE order_id = ?";
                 const [result2] = await dbcon.query(sql2, [result1.insertId]);
             } else {
                 const sql =
-                    'INSERT INTO reviews (review_text, review_photo, stars, order_id, write_date) VALUES (?, ?, ?, ?, now())';
+                    'INSERT INTO reviews (order_id,review_text, review_photo, stars, write_date) VALUES (?, ?, ?, ?, now())';
 
-                const input_data = [review_text, review_photo, stars, order_id];
+                const input_data = [order_id, review_text, review_photo, stars];
                 const [result1] = await dbcon.query(sql, input_data);
 
                 let sql2 =
-                    "SELECT review_text, review_photo, stars, DATE_FORMAT( write_date, '%Y-%m-%d') AS write_date, review_id, orders.order_id FROM reviews INNER JOIN orders ON orders.order_id = reviews.order_id";
+                    "SELECT review_text, review_photo, stars, DATE_FORMAT(write_date, '%Y-%m-%d') AS write_date, review_id, order_id FROM reviews WHERE order_id = ?";
                 const [result2] = await dbcon.query(sql2, [result1.insertId]);
             }
 
