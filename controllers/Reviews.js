@@ -117,18 +117,10 @@ module.exports = (app) => {
         const review_text = req.post('review_text');
         const review_photo = req.post('review_photo');
         const stars = req.post('stars');
-        const write_date = req.post('write_date');
         const review_id = req.post('review_id');
         const order_id = req.post('order_id');
 
-        if (
-            review_text === null ||
-            review_photo === null ||
-            stars === null ||
-            write_date === null ||
-            review_id === null ||
-            order_id === null
-        ) {
+        if (review_text === null || stars === null || review_id === null || order_id === null) {
             return next(new Error(400));
         }
 
@@ -143,9 +135,9 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO reviews (review_text, review_photo, stars, write_date, review_id, order_id) VALUES (?, ?, ?, ?, ?, ?)';
+                'INSERT INTO reviews (review_text, review_photo, stars,  review_id, order_id) VALUES (?, ?, ?, ?, ?, ?)';
 
-            const input_data = [review_text, review_photo, stars, write_date, review_id, order_id];
+            const input_data = [review_text, review_photo, stars, review_id, order_id];
             const [result1] = await dbcon.query(sql, input_data);
 
             let sql2 =
