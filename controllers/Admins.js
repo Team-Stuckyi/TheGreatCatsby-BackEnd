@@ -230,10 +230,10 @@ module.exports = (app) => {
 
     /**
      * 관리자 페이지 - 관리자 회원 관리
-     * [DELETE] /admims/getout/:user_id
+     * [PUT] /admims/getout/:user_id
      * 사용자 상태 업데이트
      */
-    router.delete("/admims/getout/:user_id", async (req, res, next) => {
+    router.put("/admims/getout/:user_id", async (req, res, next) => {
         const user_id = req.get("user_id");
 
         try {
