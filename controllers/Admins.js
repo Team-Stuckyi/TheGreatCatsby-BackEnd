@@ -249,9 +249,6 @@ module.exports = (app) => {
             if (result1.affectedRows < 1) {
                 throw new Error("탈퇴처리에 실패했습니다.");
             }
-
-            // 강제 로그아웃(세션 삭제)
-            await req.session.destroy();
         } catch (err) {
             return next(err);
         } finally {
