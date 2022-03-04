@@ -117,10 +117,9 @@ module.exports = (app) => {
         const review_text = req.post('review_text');
         const review_photo = req.post('review_photo');
         const stars = req.post('stars');
-        const review_id = req.post('review_id');
         const order_id = req.post('order_id');
 
-        if (review_text === null || stars === null || review_id === null || order_id === null) {
+        if (review_text === null || stars === null || order_id === null) {
             return next(new Error(400));
         }
 
@@ -136,9 +135,9 @@ module.exports = (app) => {
             // 데이터 저장하기
             if (review_photo === null || review_photo === undefined) {
                 const sql =
-                    'INSERT INTO reviews (review_text, stars,  review_id, order_id, write_date) VALUES (?, ?, ?, ?, now())';
+                    'INSERT INTO reviews (review_text, stars, order_id, write_date) VALUES (?, ?, ?, now())';
 
-                const input_data = [review_text, stars, review_id, order_id];
+                const input_data = [review_text, stars, order_id];
                 const [result1] = await dbcon.query(sql, input_data);
 
                 let sql2 =
@@ -146,9 +145,9 @@ module.exports = (app) => {
                 const [result2] = await dbcon.query(sql2, [result1.insertId]);
             } else {
                 const sql =
-                    'INSERT INTO reviews (review_text, review_photo, stars,  review_id, order_id, write_date) VALUES (?, ?, ?, ?, ?, now())';
+                    'INSERT INTO reviews (review_text, review_photo, stars, order_id, write_date) VALUES (?, ?, ?, ?, now())';
 
-                const input_data = [review_text, review_photo, stars, review_id, order_id];
+                const input_data = [review_text, review_photo, stars, order_id];
                 const [result1] = await dbcon.query(sql, input_data);
 
                 let sql2 =
