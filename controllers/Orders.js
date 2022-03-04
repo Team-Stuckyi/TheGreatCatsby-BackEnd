@@ -134,15 +134,16 @@ module.exports = (app) => {
 
     const user_id = req.get("user_id");
     // 저장을 위한 파라미터 입력받기
-    const price = req.post("order_price");
-    const select = req.post("order_select");
-    const count = req.post("order_count");
+    const order_price = req.post("order_price");
+    const order_date = req.post("order_date");
+    const order_select = req.post("order_select");
+    const order_count = req.post("order_count");
     const prodid = req.post("prod_id");
     const userid = req.post("user_id");
     try {
-      regexHelper.value(price, "총 금액 입력이 없습니다.");
-      regexHelper.value(select, "결재방식을 고르지 않았습니다.");
-      regexHelper.value(count, "주문 카운트가 되지 않았습니다.");
+      regexHelper.value(order_price, "총 금액 입력이 없습니다.");
+      regexHelper.value(order_select, "결재방식을 고르지 않았습니다.");
+      regexHelper.value(order_count, "주문 카운트가 되지 않았습니다.");
     } catch (err) {
       return next(err);
     }
@@ -160,7 +161,7 @@ module.exports = (app) => {
       const sql1 =
         "INSERT INTO `orders` (order_price, order_date, order_select, order_count, prod_id, user_id) VALUES (?, now(), ?, ?, ?, ?)";
 
-      const input_data1 = [price, select, count, prodid, userid];
+      const input_data1 = [order_price, order_date, order_select, order_count, prodid, userid];
       const [result1] = await dbcon.query(sql1, input_data1);
 
       // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
@@ -254,7 +255,7 @@ router.put('/orders/member/:user_id', async (req, res, next) => {
     const [result1] = await dbcon.query(sql, input_data);
 
     // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-    const sql2 = 'SELECT members.user_id, members.tel, members.addr1 FROM orders INNER JOIN members ON orders.user_id = member.user_id WHERE orders.user_id=?';
+    const sql2 = 'SELECT members.user_id, members.tel, members.addr1 FROM orders INNER JOIN members ON orders.user_id = members.user_id WHERE orders.user_id=?';
     const [result2] = await dbcon.query(sql2, [user_id]);
 
     // 조회 결과를 미리 준비한 변수에 저장함
