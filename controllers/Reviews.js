@@ -135,7 +135,7 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO reviews (review_text, review_photo, stars,  review_id, order_id) VALUES (?, ?, ?, ?, ?, ?)';
+                'INSERT INTO reviews (review_text, review_photo, stars,  review_id, order_id) VALUES (?, ?, ?, ?, ?)';
 
             const input_data = [review_text, review_photo, stars, review_id, order_id];
             const [result1] = await dbcon.query(sql, input_data);
