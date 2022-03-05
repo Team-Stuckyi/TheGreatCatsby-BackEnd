@@ -14,6 +14,7 @@ const router = require('express').Router();
 const mysql2 = require('mysql2/promise');
 
 const url = require('url');
+const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
