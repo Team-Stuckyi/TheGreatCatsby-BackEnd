@@ -36,7 +36,7 @@ http.createServer(function(req, res){
    
       var deploySh = spawn('sh', ['hook.sh']);
       deploySh.stdout.on('data', function(data){
-          var buff = new Buffer(data);
+          var buff = new Buffer.alloc(data);
           console.log(buff.toString('utf-8'));
       });
 
