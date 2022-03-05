@@ -39,10 +39,10 @@ module.exports = (app) => {
         limits: { fileSize: 5 * 1024 * 1024 },
     });
 
-    router.post('/upload', upload.single('imgFile'), (req, res) => {
-        console.log(req.file);
-        res.json({ url: `/img/${req.file.filename}` });
-    });
+    // router.post('/upload', upload.single('imgFile'), (req, res) => {
+    //     console.log(req.file);
+    //     res.json({ url: `/img/${req.file.filename}` });
+    // });
 
     let dbcon = null;
 
@@ -142,10 +142,11 @@ module.exports = (app) => {
      * [POST] /reviewlist.html
      * 전송 정보 : review_id, review_text, review_photo, stars,
      */
-    router.post('/reviews/write', async (req, res, next) => {
+
+    router.post('/reviews/write', upload.single('imgFile'), async (req, res, next) => {
         // 저장을 위한 파라미터 받기
         const review_text = req.post('review_text');
-        const review_photo = req.post('review_photo');
+        const review_photo = { url: `/img/${req.file.filename}` };
         const stars = req.post('stars');
         const order_id = req.post('order_id');
 
