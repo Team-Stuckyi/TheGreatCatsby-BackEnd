@@ -36,7 +36,7 @@ const path = require('path');
 // express 본체
 const express = require('express');
 // CORS 문제 해결을 위한 모듈
-const cors = require("cors");
+const cors = require('cors');
 // 클라이언트의 정보를 조회할 수 있는 기능
 const useragent = require('express-useragent');
 // 특정 폴더의 파일을 URL로 노출 시킴
@@ -136,6 +136,7 @@ app.use(methodOverride('_method'));
 
 // HTML,CSS,IMG,JS 등의 정적 파일을 URL에 노출시킬 폴더 연결
 app.use('/', static(config.public_path));
+app.use('/_files/uploads', static(config.public_path));
 
 // favicon 설정
 app.use(favicon(config.favicon_path));
