@@ -19,21 +19,21 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = (app) => {
-    fs.readdir('uploads', (error) => {
+    fs.readdir('_files/uploads', (error) => {
         // uploads 폴더 없으면 생성
         if (error) {
-            fs.mkdirSync('uploads');
+            fs.mkdirSync('_files/uploads');
         }
     });
 
     const upload = multer({
         storage: multer.diskStorage({
             destination(req, file, cb) {
-                cb(null, 'uploads/');
+                cb(null, '_files/uploads/');
             },
             filename(req, file, cb) {
                 const ext = path.extname(file.originalname);
-                cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
+                cb(null, 'img' + Date.now() + ext);
             },
         }),
         limits: { fileSize: 5 * 1024 * 1024 },
