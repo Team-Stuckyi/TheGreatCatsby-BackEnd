@@ -146,7 +146,7 @@ module.exports = (app) => {
     router.post('/reviews/write', upload.single('imgFile'), async (req, res, next) => {
         // 저장을 위한 파라미터 받기
         const review_text = req.post('review_text');
-        const review_photo = res.json({ url: `/img/${req.file.filename}` });
+        const review_photo = `/${req.file.filename}`;
         const stars = req.post('stars');
         const order_id = req.post('order_id');
 
