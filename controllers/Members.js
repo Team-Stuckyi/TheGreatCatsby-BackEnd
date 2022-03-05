@@ -261,7 +261,7 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO members (tel, addr1, user_id) VALUES (?, ?)';
+                'INSERT INTO members (tel, addr1, user_id) VALUES (?, ?, ?)';
             const input_data = [
                 tel,
                 addr1,
