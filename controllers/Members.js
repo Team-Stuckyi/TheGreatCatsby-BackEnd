@@ -242,7 +242,7 @@ module.exports = (app) => {
         const tel = req.post('tel');
         const addr1 = req.post('addr1');
         const user_id = req.post('user_id');
-
+        const name = req.post('name');
         /** 데이터 저장하기 */
         // 데이터 조회 결과가 저장될 빈 변수
         let json = null;
@@ -254,18 +254,13 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO members (tel, addr1, user_id) VALUES (?, ?, ?)';
-            const input_data = [
-                tel,
-                addr1,
-                user_id,
-            ];
-
+                'INSERT INTO members (tel, addr1, name) VALUES (?, ?, ?)';
+            const input_data = [tel, addr1, name];
             const [result1] = await dbcon.query(sql, input_data);
 
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
             let sql2 =
-                'SELECT user_id, tel, addr1 FROM members WHERE user_id = ?';
+                "SELECT user_id, name, tel, addr1 FROM members WHERE user_id = ?";
 
             const [result2] = await dbcon.query(sql2, [user_id]);
 
