@@ -263,7 +263,7 @@ module.exports = (app) => {
             const [result1] = await dbcon.query(sql, input_data);
 
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-            const sql2 =
+            let sql2 =
                 'SELECT user_id, tel, addr1 FROM members WHERE user_id=?';
 
             const [result2] = await dbcon.query(sql2, [user_id]);
