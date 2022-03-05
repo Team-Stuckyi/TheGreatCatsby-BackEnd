@@ -228,7 +228,7 @@ module.exports = (app) => {
         // 조회 결과를 세션에 저장
         req.session.memberInfo = json[0];
 
-        res.sendJson();
+        res.sendJson({item: json});
     });
 
     /**
