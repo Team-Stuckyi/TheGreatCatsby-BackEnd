@@ -136,7 +136,7 @@ app.use(methodOverride('_method'));
 
 // HTML,CSS,IMG,JS 등의 정적 파일을 URL에 노출시킬 폴더 연결
 app.use('/', static(config.public_path));
-app.use('/_files/uploads', static(config.public_path));
+app.use(express.static('../_files/uploads'));
 
 // favicon 설정
 app.use(favicon(config.favicon_path));
