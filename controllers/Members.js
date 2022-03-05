@@ -242,13 +242,6 @@ module.exports = (app) => {
         const tel = req.post('tel');
         const addr1 = req.post('addr1');
         const user_id = req.post('user_id');
-        if (
-            tel === null ||
-            addr1 === null ||
-            user_id === null
-        ) {
-            return next(new Error(400));
-        }
 
         /** 데이터 저장하기 */
         // 데이터 조회 결과가 저장될 빈 변수
@@ -261,11 +254,10 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO members (tel, addr1, user_id) VALUES (?, ?, ?)';
+                'INSERT INTO members (tel, addr1) VALUES (?, ?)';
             const input_data = [
                 tel,
                 addr1,
-                user_id,
             ];
 
             const [result1] = await dbcon.query(sql, input_data);
@@ -274,7 +266,7 @@ module.exports = (app) => {
             const sql2 =
                 'SELECT user_id, tel, addr1 FROM members WHERE user_id=?';
 
-            const [result2] = await dbcon.query(sql2, [result1.insertId]);
+            const [result2] = await dbcon.query(sql2, [user_id]);
 
             // 조회결과를 미리 준비한 변수에 저장함
             json = result2;
