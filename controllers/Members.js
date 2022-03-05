@@ -231,6 +231,63 @@ module.exports = (app) => {
         res.sendJson();
     });
 
+    /**
+     * 사용자 페이지 - 주소 추가
+     * [POST] /member
+     * 전송 정보 : tel, addr1,
+     */
+    /** 데이터 추가 --> Create(INSERT) */
+    router.post('/member/newadress/:user_id', async (req, res, next) => {
+        // 저장을 위한 파라미터 입력받기
+        const tel = req.post('tel');
+        const addr1 = req.post('addr1');
+        const user_id = req.post('user_id');
+        if (
+            tel === null ||
+            addr1 === null ||
+            user_id === null
+        ) {
+            return next(new Error(400));
+        }
+
+        /** 데이터 저장하기 */
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
+
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
+
+            // 데이터 저장하기
+            const sql =
+                'INSERT INTO members (tel, addr1, user_id) VALUES (?, ?)';
+            const input_data = [
+                tel,
+                addr1,
+                user_id,
+            ];
+
+            const [result1] = await dbcon.query(sql, input_data);
+
+            // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
+            const sql2 =
+                'SELECT user_id, tel, addr1 FROM members WHERE user_id=?';
+
+            const [result2] = await dbcon.query(sql2, [result1.insertId]);
+
+            // 조회결과를 미리 준비한 변수에 저장함
+            json = result2;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
+
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson({ item: json });
+    });
+
     /** =-=-=-=-=-=-=-=-=-=-= router.put =-=-=-=-=-=-=-=-=-=-=  */
 
     /**
