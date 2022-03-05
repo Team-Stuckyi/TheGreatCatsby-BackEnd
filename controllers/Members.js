@@ -237,7 +237,7 @@ module.exports = (app) => {
      * 전송 정보 : tel, addr1,
      */
     /** 데이터 추가 --> Create(INSERT) */
-    router.post('/member/newadress/:user_id', async (req, res, next) => {
+    router.post('/members/new/:user_id', async (req, res, next) => {
         // 저장을 위한 파라미터 입력받기
         const tel = req.post('tel');
         const addr1 = req.post('addr1');
@@ -254,17 +254,18 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO members (tel, addr1) VALUES (?, ?)';
+                'INSERT INTO members (tel, addr1, user_id) VALUES (?, ?, ?)';
             const input_data = [
                 tel,
                 addr1,
+                user_id,
             ];
 
             const [result1] = await dbcon.query(sql, input_data);
 
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
             let sql2 =
-                'SELECT user_id, tel, addr1 FROM members WHERE user_id=?';
+                'SELECT user_id, tel, addr1 FROM members WHERE user_id = ?';
 
             const [result2] = await dbcon.query(sql2, [user_id]);
 
