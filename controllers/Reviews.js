@@ -13,76 +13,7 @@ const PageNotFoundException = require('../exceptions/PageNotFoundException');
 const router = require('express').Router();
 const mysql2 = require('mysql2/promise');
 
-const fileHelper = require('../helper/FileHelper');
-const url = require('url');
-const path = require('path');
-const multer = require('multer');
-
 module.exports = (app) => {
-    /** 사진 업로드 모듈 start */
-    const multipart = multer({
-        storage: multer.diskStorage({
-            /** 업로드 된 파일의 저장될 디렉토리 설정 */
-            // req는 요청정보, file은 최종적으로 업로드된 결과 데이터가 저장되어 있을 객체
-            destination: (req, file, callback) => {
-                //폴더생성
-                fileHelper.mkdirs(config.upload.dir);
-                fileHelper.mkdirs(config.upload.dir);
-                console.debug(file);
-
-                // 업로드 정보에 백엔드의 업로드 파일 저장 폴더 위치를 추가하낟.
-                file.dir = config.upload.dir.replace(/\\/gi, '/');
-
-                // multer 객체에게 업로드 경로를 전달
-                callback(null, config.upload.dir);
-            },
-
-            /** 업로드 된 파일이 저장될 파일명 설정 */
-            // file.originalname 변수에 파일이름이 저장되어 있다. -> ex helloworld.png
-            filename: (req, file, callback) => {
-                // 파일의 확장자만 추출 --> .png
-                const extName = path.extname(file.originalname);
-                // 파일이 저장될 이름 (현재 시각)
-                const saveName = new Date().getTime().toString() + extName.toLowerCase();
-                // 업로드 정보에 백엔드의 업로드 파일 이름을 추가한다.
-                file.savename = saveName;
-                // 여러개의 파일을 업로드 할때 경로가 생기지 않는 문제 해결하기
-                file.path = path.join(file.dir, saveName);
-                // 업로드 정보에 파일에 접근할 수 있는 URL값 추가
-                file.url = path.join(config.upload.path, saveName).replace(/\\/gi, '/');
-                // 구성된 정보를 req객체에게 추가
-                if (req.file instanceof Array) {
-                    req.file.push(file);
-                } else {
-                    req.file = file;
-                }
-
-                callback(null, saveName);
-            },
-        }),
-        /** 요량, 최대 업로드 파일 수 제한 설정 */
-        limits: {
-            files: config.upload.max_count,
-            fileSize: config.upload.max_size,
-        },
-        /**업로드 될 파일의 확장자 제한 */
-        fileFilter: (req, file, callback) => {
-            //파일의 종류 얻기
-            var mimetype = file.mimetype;
-
-            //파일 종류 문자열에 "image/"가 포함되어 있지 않은 경우
-            if (mimetype.indexOf('image/') == -1) {
-                const err = new Error();
-                err.result_code = 500;
-                err.result_msg = '이미지 파일만 업로드 가능합니다.';
-                return callback(err);
-            }
-
-            callback(null, true);
-        },
-    });
-    /** 사진 업로드 모듈 end */
-
     let dbcon = null;
 
     /*
@@ -184,7 +115,7 @@ module.exports = (app) => {
     router.post('/reviews/write', async (req, res, next) => {
         // 저장을 위한 파라미터 받기
         const review_text = req.post('review_text');
-        const review_photo = multipart.single('review_photo');
+        const review_photo = req.post('review_photo');
         const stars = req.post('stars');
         const order_id = req.post('order_id');
 
