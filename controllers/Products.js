@@ -122,6 +122,7 @@ module.exports = (app) => {
             }
 
             const [result1] = await dbcon.query(sql1, args1);
+            logger.debug(JSON.stringify(result1));
             totalCount = result1.length;
 
             // 페이지 정보를 계산한다.
