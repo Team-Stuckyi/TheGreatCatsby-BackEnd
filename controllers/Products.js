@@ -36,7 +36,6 @@ module.exports = (app) => {
             let sql =
                 'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
             const [result] = await dbcon.query(sql);
-            logger.info(JSON.stringify(result));
             json = result;
         } catch (err) {
             return next(err);
@@ -121,7 +120,8 @@ module.exports = (app) => {
                 sql1 += " WHERE prod_id LIKE concat('%', ?, '%')";
                 args1.push(query);
             }
-
+            
+            logger.info(sql1);
             const [result1] = await dbcon.query(sql1, args1);
             logger.info(JSON.stringify(result1));
             totalCount = result1.length;
