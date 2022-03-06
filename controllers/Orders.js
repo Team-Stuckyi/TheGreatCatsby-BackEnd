@@ -353,7 +353,7 @@ module.exports = (app) => {
 
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
             const sql2 = 'SELECT order_id, order_date, order_price, order_status FROM orders WHERE order_id=?';
-            const [result2] = await dbcon.query(sql2, [name]);
+            const [result2] = await dbcon.query(sql2, [order_id]);
 
             // 조회 결과를 미리 준비한 변수에 저장함
             json = result2;
