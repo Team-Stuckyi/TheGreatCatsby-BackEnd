@@ -83,6 +83,7 @@ module.exports = (app) => {
             dbcon.end();
         }
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        logger.info(JSON.stringify({ pagenation: pagenation, item: json, totalCount: totalCount }));
         res.sendJson({ pagenation: pagenation, item: json, totalCount: totalCount });
     });
 
