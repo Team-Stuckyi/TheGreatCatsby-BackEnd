@@ -36,6 +36,7 @@ module.exports = (app) => {
             let sql =
                 'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
             const [result] = await dbcon.query(sql);
+            logger.info(JSON.stringify(result));
             json = result;
         } catch (err) {
             return next(err);
@@ -112,7 +113,7 @@ module.exports = (app) => {
 
             // 전체 데이터 수를 조회
             let sql1 =
-                'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
+                "SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products";
 
             let args1 = [];
 
@@ -122,7 +123,7 @@ module.exports = (app) => {
             }
 
             const [result1] = await dbcon.query(sql1, args1);
-            logger.debug(JSON.stringify(result1));
+            logger.info(JSON.stringify(result1));
             totalCount = result1.length;
 
             // 페이지 정보를 계산한다.
@@ -131,7 +132,7 @@ module.exports = (app) => {
 
             // 데이터 조회
             let sql2 =
-                'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
+                "SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products";
 
             let args2 = [];
 
