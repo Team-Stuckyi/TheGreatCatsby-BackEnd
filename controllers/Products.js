@@ -92,6 +92,7 @@ module.exports = (app) => {
     /** 전체 목록 조회 */
     router.get('/products/all', async (req, res, next) => {
         // 검색어 파라미터 받기 -> 검색어가 없을 경우 전체 목록 조회이므로 유효성검사 안함
+        logger.info('products all start');
         const query = req.get('query');
 
         // 현재 페이지 번호 받기 (기본값 1)
