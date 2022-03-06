@@ -21,7 +21,7 @@ module.exports = (app) => {
      * 관리자 페이지 - 관리자 주문 관리 페이지
      * 제품 주문을 화면에 보여주는 데이터
      * [GET] /orderlist.html
-     * 전송 정보 : price, order_date, member => name, member => email, products => name
+     * 전송 정보 : price, order_date, member, order_status => name, member => email, products => name
      */
 
     router.get('/orders/all', async (req, res, next) => {
@@ -43,7 +43,7 @@ module.exports = (app) => {
             await dbcon.connect();
 
             let sql1 =
-                "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, members.name, members.email, products.name, products.info_photo FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id";
+                "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, orders.order_status, members.name, members.email, products.name, products.info_photo FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id";
 
             let args1 = [];
 
@@ -59,7 +59,7 @@ module.exports = (app) => {
             logger.debug(JSON.stringify(pagenation));
 
             let sql2 =
-                "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, members.name, members.email, products.name, products.info_photo FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id";
+                "SELECT orders.order_id, orders.order_price, DATE_FORMAT(orders.order_date, '%Y-%m-%d') AS order_date, orders.order_status, members.name, members.email, products.name, products.info_photo FROM orders INNER JOIN members ON orders.user_id = members.user_id INNER JOIN products ON orders.prod_id = products.prod_id";
             //sql 문에 설정할 치환값
             let args2 = [];
 
@@ -267,15 +267,16 @@ module.exports = (app) => {
  * PayAdress 컴포넌트
  * 주소를 수정하는 라우터
  * [PUT] /product
- * 전송 정보 : tel, addr1, user_id
+ * 전송 정보 : tel, addr1, user_id, order_status
  */
     /** 데이터 수정 --> Update(UPDATE) */
     router.put('/orders/member/:user_id', async (req, res, next) => {
         const user_id = req.get('user_id');
         const tel = req.post('tel');
         const addr1 = req.post('addr1');
+        const order_status = req.post('order_status');
 
-        if (user_id === null || tel === null || addr1 === null) {
+        if (user_id === null || tel === null || addr1 === null || order_status === null) {
             return next(new Error(400));
         }
 
@@ -289,8 +290,8 @@ module.exports = (app) => {
             await dbcon.connect();
 
             // 데이터 수정하기
-            const sql = 'UPDATE members SET tel=?, addr1=? WHERE user_id=?';
-            const input_data = [tel, addr1, user_id];
+            const sql = 'UPDATE members SET tel=?, addr1=?, order_status=? WHERE user_id=?';
+            const input_data = [tel, addr1, order_status, user_id];
             const [result1] = await dbcon.query(sql, input_data);
 
             // 결과 행 수가 0이라면 예외처리
