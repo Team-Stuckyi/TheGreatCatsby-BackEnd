@@ -177,13 +177,13 @@ module.exports = (app) => {
         const order_count = req.post('order_count');
         const prodid = req.post('prod_id');
         const userid = req.post('user_id');
-        // try {
-        //     regexHelper.value(order_price, '총 금액 입력이 없습니다.');
-        //     regexHelper.value(order_select, '결재방식을 고르지 않았습니다.');
-        //     regexHelper.value(order_count, '주문 카운트가 되지 않았습니다.');
-        // } catch (err) {
-        //     return next(err);
-        // }
+        try {
+            regexHelper.value(order_price, '총 금액 입력이 없습니다.');
+            regexHelper.value(order_select, '결재방식을 고르지 않았습니다.');
+            regexHelper.value(order_count, '주문 카운트가 되지 않았습니다.');
+        } catch (err) {
+            return next(err);
+        }
 
         /** 데이터 저장하기 */
         // 데이터 조회 결과가 저장될 빈 변수
