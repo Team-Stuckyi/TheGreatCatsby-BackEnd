@@ -267,16 +267,15 @@ module.exports = (app) => {
  * PayAdress 컴포넌트
  * 주소를 수정하는 라우터
  * [PUT] /product
- * 전송 정보 : tel, addr1, user_id, order_status
+ * 전송 정보 : tel, addr1, user_id
  */
     /** 데이터 수정 --> Update(UPDATE) */
     router.put('/orders/member/:user_id', async (req, res, next) => {
         const user_id = req.get('user_id');
         const tel = req.post('tel');
         const addr1 = req.post('addr1');
-        const order_status = req.post('order_status');
 
-        if (user_id === null || tel === null || addr1 === null || order_status === null) {
+        if (user_id === null || tel === null || addr1 === null) {
             return next(new Error(400));
         }
 
@@ -290,7 +289,7 @@ module.exports = (app) => {
             await dbcon.connect();
 
             // 데이터 수정하기
-            const sql = 'UPDATE members SET tel=?, addr1=?, order_status=? WHERE user_id=?';
+            const sql = 'UPDATE members SET tel=?, addr1=? WHERE user_id=?';
             const input_data = [tel, addr1, order_status, user_id];
             const [result1] = await dbcon.query(sql, input_data);
 
@@ -314,7 +313,61 @@ module.exports = (app) => {
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
         res.sendJson({ item: json });
     });
+    
+    
+    /**
+     * 관리자 페이지 - 일반 주문 관리 페이지
+     * 주문 정보를 화면에 보여주는 데이터
+     * [PUT] /orders
+     * 전송 정보 : order_id, name, order_date, email, order_price, order_status
+     */
+    /** 데이터 수정 --> Update(UPDATE) */
+    router.put('/orders/:order_id', async (req, res, next) => {
+        const order_id = req.get('prod_id');
+        const name = req.put('name');
+        const order_date = req.put('order_date');
+        const email = req.put('email');
+        const order_price = req.put('order_price');
+        const order_status = req.put('order_status');
+
+        if (order_id === null || name === null || order_date === null || email === null || order_price === null || order_status === null) {
+            return next(new Error(400));
+        }
+
+        /** 데이터 수정하기 */
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
+
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
+
+            // 데이터 수정하기
+            const sql = 'UPDATE orders SET name=?, order_date=?, email=?, order_price=?, order_status=? WHERE order_id=?';
+            const input_data = [name, order_date, email, order_price, order_status, order_id];
+            const [result1] = await dbcon.query(sql, input_data);
+
+            // 결과 행 수가 0이라면 예외처리
+            if (result1.affectedRows < 1) {
+                throw new Error('수정된 데이터가 없습니다.');
+            }
+
+            // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
+            const sql2 = 'SELECT order_id, name, order_date, email, order_price, order_status FROM orders WHERE order_id=?';
+            const [result2] = await dbcon.query(sql2, [name]);
+
+            // 조회 결과를 미리 준비한 변수에 저장함
+            json = result2;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
+
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson({ item: json });
+    });
+    
     return router;
 };
-
-
