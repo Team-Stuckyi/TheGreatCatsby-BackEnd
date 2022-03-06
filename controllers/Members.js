@@ -258,8 +258,8 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO members (tel, addr1) VALUES (?, ?)';
-            const input_data = [tel, addr1, name];
+                'INSERT INTO members (tel, addr1, user_id) VALUES (?, ?, ?)';
+            const input_data = [tel, addr1, user_id];
             const [result1] = await dbcon.query(sql, input_data);
 
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
