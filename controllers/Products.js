@@ -103,6 +103,7 @@ module.exports = (app) => {
         // 데이터 조회 결과가 저장될 빈 변수
         let json = null;
         let pagenation = null;
+        let totalCount = null;
 
         try {
             // 데이터베이스 접속
@@ -121,7 +122,7 @@ module.exports = (app) => {
             }
 
             const [result1] = await dbcon.query(sql1, args1);
-            const totalCount = result1[0].cnt;
+            totalCount = result1.length;
 
             // 페이지 정보를 계산한다.
             pagenation = utilHelper.pagenation(totalCount, page, rows);
@@ -153,7 +154,7 @@ module.exports = (app) => {
         }
 
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
-        res.sendJson({ pagenation: pagenation, item: json });
+        res.sendJson({ pagenation: pagenation, item: json, totalCount: totalCount });
     });
 
     /**
