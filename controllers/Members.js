@@ -228,7 +228,7 @@ module.exports = (app) => {
         // 조회 결과를 세션에 저장
         req.session.memberInfo = json[0];
 
-        res.sendJson({item: json});
+        res.sendJson({ item: json });
     });
 
     /**
@@ -242,7 +242,11 @@ module.exports = (app) => {
         const tel = req.post('tel');
         const addr1 = req.post('addr1');
         const user_id = req.post('user_id');
-        const name = req.post('name');
+
+        if (user_id === null || tel === null || addr1 === null) {
+            //  400 Bad Request -> 잘못된 요청
+            return next(new Error(400));
+        }
         /** 데이터 저장하기 */
         // 데이터 조회 결과가 저장될 빈 변수
         let json = null;
@@ -254,7 +258,7 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO members (tel, addr1, name) VALUES (?, ?, ?)';
+                'INSERT INTO members (tel, addr1) VALUES (?, ?)';
             const input_data = [tel, addr1, name];
             const [result1] = await dbcon.query(sql, input_data);
 
