@@ -323,7 +323,7 @@ module.exports = (app) => {
      */
     /** 데이터 수정 --> Update(UPDATE) */
     router.put('/orders/:order_id', async (req, res, next) => {
-        const order_id = req.get('prod_id');
+        const order_id = req.get('order_id');
         const name = req.put('name');
         const order_date = req.put('order_date');
         const email = req.put('email');
