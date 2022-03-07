@@ -55,7 +55,6 @@ module.exports = (app) => {
      * user => prodlist.html. review.html
      * 전송 정보 : user_id => users => name, email , prod_id => products =>name, stars, review_text, write_date, review_photo
      */
-
     router.get('/reviews/look', async (req, res, next) => {
         //검색어 파라미터 받기 -> 검색어가 없을 경우 전체 목록 조회이므로 유효성 검사 안함
         const query = req.get('query');
@@ -75,7 +74,7 @@ module.exports = (app) => {
             await dbcon.connect();
 
             let sql1 =
-                "SELECT r.review_id, m.email, p.name, m.name, r.review_text, r.stars, DATE_FORMAT(r.write_date, '%Y-%m-%d') AS write_date, r.review_photo FROM reviews r LEFT JOIN orders  o ON r.order_id = o.order_id LEFT JOIN members  m ON o.user_id = m.user_id  LEFT JOIN products p ON o.prod_id = p.prod_id;";
+                "SELECT r.review_id, m.email, p.name, m.name, r.review_text, r.stars, DATE_FORMAT(r.write_date, '%Y-%m-%d') AS write_date, r.review_photo FROM reviews AS r LEFT JOIN orders AS o ON r.order_id = o.order_id LEFT JOIN members AS m ON o.user_id = m.user_id LEFT JOIN products p ON o.prod_id = p.prod_id;";
 
             let args1 = [];
 
@@ -95,6 +94,31 @@ module.exports = (app) => {
         }
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
         res.sendJson({ pagenation: pagenation, item: json });
+    });
+
+    /*
+     * 관리자 페이지- 리뷰 관리 조회 페이지
+     * [GET] /review/admin
+     */
+    router.get('/review/admin', async (req, res, next) => {
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
+
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
+
+            let sql =
+                "SELECT r.review_id, p.name AS pname, m.email, r.review_text, r.stars, DATE_FORMAT(r.write_date, '%Y-%m-%d') AS write_date FROM reviews AS r LEFT JOIN orders AS o ON r.order_id = o.order_id LEFT JOIN members AS m ON o.user_id = m.user_id LEFT JOIN products p ON o.prod_id = p.prod_id;";
+            const [result] = await dbcon.query(sql);
+            json = result;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
+        res.sendJson({ item: json });
     });
 
     /**
