@@ -58,7 +58,7 @@ module.exports = (app) => {
             }
             
             if (prodNameQuery != null) {
-                sql1 += " WHERE name LIKE concat concat('%', ?, '%') ";
+                sql1 += " WHERE name LIKE concat('%', ?, '%') ";
                 args1.push(prodNameQuery);
             }
             
@@ -91,7 +91,7 @@ module.exports = (app) => {
             }
             
             if (prodNameQuery != null) {
-                sql2 += " WHERE name LIKE concat concat('%', ?, '%') ";
+                sql2 += " WHERE name LIKE concat('%', ?, '%') ";
                 args2.push(prodNameQuery);
             }
             
