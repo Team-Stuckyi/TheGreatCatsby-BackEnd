@@ -97,8 +97,8 @@ module.exports = (app) => {
             let args2 = [];
 
             if (orderIdQuery != null) {
-                sql1 += " WHERE orders.order_id = ? ";
-                args1.push(orderIdQuery);
+                sql2 += " WHERE orders.order_id = ? ";
+                args2.push(orderIdQuery);
             }
             
             if (orderProdQuery != null) {
