@@ -305,7 +305,7 @@ module.exports = (app) => {
      * [PUT] /members/address/:user_id
      * 수정 정보 : email, name,  tel
      */
-    router.put("/members/:user_id", async (req, res, next) => {
+    router.put("/members/edit/:user_id", async (req, res, next) => {
         const user_id = req.get("user_id");
         const email = req.post("email");
         const name = req.post("name");
@@ -364,7 +364,7 @@ module.exports = (app) => {
      * [PUT] /members/:user_id
      * 사용자 탈퇴
      */
-    router.put("/members/:user_id", async (req, res, next) => {
+    router.put("/members/getout/:user_id", async (req, res, next) => {
         const user_id = req.get("user_id");
 
         try {
