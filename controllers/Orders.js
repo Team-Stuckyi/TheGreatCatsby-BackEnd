@@ -55,32 +55,32 @@ module.exports = (app) => {
             let args1 = [];
 
             if (orderIdQuery != null) {
-                sql1 += " WHERE order_id = ? ";
+                sql1 += " WHERE orders.order_id = ? ";
                 args1.push(orderIdQuery);
             }
             
             if (orderProdQuery != null) {
-                sql1 += " WHERE name LIKE concat ('%', ?, '%')";
+                sql1 += " WHERE products.name LIKE concat ('%', ?, '%')";
                 args1.push(orderProdQuery);
             }
             
             if (orderDateQuery != null) {
-                sql1 += " WHERE order_date LIKE concat ('%', ?, '%')";
+                sql1 += " WHERE orders.order_date LIKE concat ('%', ?, '%')";
                 args1.push(orderDateQuery);
             }
             
             if (emailQuery != null) {
-                sql1 += " WHERE email = ? ";
+                sql1 += " WHERE members.email = ? ";
                 args1.push(emailQuery);
             }
             
             if (orderPriceQuery != null) {
-                sql1 += " WHERE order_price = ? ";
+                sql1 += " WHERE orders.order_price = ? ";
                 args1.push(orderPriceQuery);
             }
             
             if (orderStatusQuery != null) {
-                sql1 += " WHERE order_status = ? ";
+                sql1 += " WHERE orders.order_status = ? ";
                 args1.push(orderStatusQuery);
             }
                        
@@ -97,32 +97,32 @@ module.exports = (app) => {
             let args2 = [];
 
             if (orderIdQuery != null) {
-                sql1 += " WHERE order_id = ? ";
+                sql1 += " WHERE orders.order_id = ? ";
                 args1.push(orderIdQuery);
             }
             
             if (orderProdQuery != null) {
-                sql2 += " WHERE name LIKE concat ('%', ?, '%')";
+                sql2 += " WHERE products.name LIKE concat ('%', ?, '%')";
                 args2.push(orderProdQuery);
             }
             
             if (orderDateQuery != null) {
-                sql2 += " WHERE order_date LIKE concat ('%', ?, '%')";
+                sql2 += " WHERE orders.order_date LIKE concat ('%', ?, '%')";
                 args2.push(orderDateQuery);
             }
             
             if (emailQuery != null) {
-                sql2 += " WHERE email = ? ";
+                sql2 += " WHERE members.email = ? ";
                 args2.push(emailQuery);
             }
             
             if (orderPriceQuery != null) {
-                sql2 += " WHERE order_price = ? ";
+                sql2 += " WHERE orders.order_price = ? ";
                 args2.push(orderPriceQuery);
             }
             
             if (orderStatusQuery != null) {
-                sql2 += " WHERE order_status = ? ";
+                sql2 += " WHERE orders.order_status = ? ";
                 args2.push(orderStatusQuery);
             }
             
