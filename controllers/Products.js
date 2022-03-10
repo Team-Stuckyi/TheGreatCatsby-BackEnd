@@ -233,8 +233,8 @@ module.exports = (app) => {
         const stock = req.post('stock');
         const price = req.post('price');
         const category = req.post('category');
-        const thumbnail_photo = `/${req.file[0].filename}`;
-        const info_photo = `/${req.file[1].filename}`;
+        const thumbnail_photo = `/${req.files['thumbImage'][0].filename}`;
+        const info_photo = `/${req.files['infoImage'][0].filename}`;
         const prod_info = req.post('prod_info');
         const prod_feature = req.post('prod_feature');
 
