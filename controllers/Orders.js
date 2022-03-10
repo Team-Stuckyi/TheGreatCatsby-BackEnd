@@ -378,16 +378,18 @@ module.exports = (app) => {
      * 관리자 페이지 - 일반 주문 관리 페이지
      * 주문 정보를 화면에 보여주는 데이터
      * [PUT] /orders
-     * 전송 정보 : order_id, order_date, order_price, order_status
+     * 전송 정보 : order_id, products.name, order_date, members.email, order_price, order_status
      */
     /** 데이터 수정 --> Update(UPDATE) */
     router.put('/orders/:order_id', async (req, res, next) => {
         const order_id = req.get('order_id');
+        const name = req.put('name');
         const order_date = req.put('order_date');
+        const email = req.put('email');
         const order_price = req.put('order_price');
         const order_status = req.put('order_status');
 
-        if (order_id === null || order_date === null || order_price === null || order_status === null) {
+        if (order_id === null || name === null || order_date === null || email === null || order_price === null || order_status === null) {
             return next(new Error(400));
         }
 
@@ -401,8 +403,8 @@ module.exports = (app) => {
             await dbcon.connect();
 
             // 데이터 수정하기
-            const sql = 'UPDATE orders SET order_date=?, order_price=?, order_status=? WHERE order_id=?';
-            const input_data = [order_date, order_price, order_status, order_id];
+            const sql = 'UPDATE orders SET name=?, order_date=?, email=?, order_price=?, order_status=? WHERE order_id=?';
+            const input_data = [name, order_date, email, order_price, order_status, order_id];
             const [result1] = await dbcon.query(sql, input_data);
 
             // 결과 행 수가 0이라면 예외처리
@@ -411,7 +413,7 @@ module.exports = (app) => {
             }
 
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-            const sql2 = 'SELECT order_id, order_date, order_price, order_status FROM orders WHERE order_id=?';
+            const sql2 = 'SELECT order_id, name, order_date, email, order_price, order_status FROM orders WHERE order_id=?';
             const [result2] = await dbcon.query(sql2, [order_id]);
 
             // 조회 결과를 미리 준비한 변수에 저장함
