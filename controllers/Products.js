@@ -17,7 +17,7 @@ const fs = require('fs');
 /** 라우팅 정의 부분 */
 module.exports = (app) => {
     let dbcon = null;
-
+    /*
     fs.readdir('_files/uploads', (error) => {
         // uploads 폴더 없으면 생성
         if (error) {
@@ -37,7 +37,7 @@ module.exports = (app) => {
         }),
         limits: { fileSize: 5 * 1024 * 1024 },
     });
-
+    */
     /**
      * 관리자 페이지 - 일반 상품 관리 페이지
      * 사용자 정보를 화면에 보여주는 데이터
@@ -218,7 +218,7 @@ module.exports = (app) => {
     /* */
     
     
-
+    
     /**
      * 관리자 페이지 - 일반 상품 관리 페이지
      * 사용자 정보를 화면에 보여주는 데이터
@@ -226,6 +226,8 @@ module.exports = (app) => {
      * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, review_id, review_count, star_avg
      */
     /** 데이터 추가 --> Create(INSERT) */
+    /*
+    
     router.post('/products', upload.fields([{name: 'thumbImage'}, {name: 'infoImage'}]), async (req, res, next) => {
         // 저장을 위한 파라미터 입력받기
         const name = req.post('name');
@@ -295,6 +297,8 @@ module.exports = (app) => {
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
         res.sendJson({ item: json });
     });
+    */
+
     /**
      * 관리자 페이지 - 일반 상품 관리 페이지
      * 사용자 정보를 화면에 보여주는 데이터
