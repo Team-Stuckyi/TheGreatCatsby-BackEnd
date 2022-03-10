@@ -11,10 +11,32 @@ const router = require('express').Router();
 const mysql2 = require('mysql2/promise');
 const regexHelper = require('../helper/RegexHelper');
 const utilHelper = require('../helper/UtilHelper');
+const multer = require('multer');
+const fs = require('fs');
 
 /** 라우팅 정의 부분 */
 module.exports = (app) => {
     let dbcon = null;
+
+    fs.readdir('_files/uploads', (error) => {
+        // uploads 폴더 없으면 생성
+        if (error) {
+            fs.mkdirSync('_files/uploads');
+        }
+    });
+
+    const upload = multer({
+        storage: multer.diskStorage({
+            destination(req, file, cb) {
+                cb(null, '_files/uploads/');
+            },
+            filename(req, file, cb) {
+                const ext = path.extname(file.originalname);
+                cb(null, 'img' + Date.now() + ext);
+            },
+        }),
+        limits: { fileSize: 5 * 1024 * 1024 },
+    });
 
     /**
      * 관리자 페이지 - 일반 상품 관리 페이지
@@ -204,17 +226,19 @@ module.exports = (app) => {
      * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, review_id, review_count, star_avg
      */
     /** 데이터 추가 --> Create(INSERT) */
-    router.post('/products', async (req, res, next) => {
+    router.post('/products', upload.fields([{name: 'thumbImage'}, {name: 'infoImage'}]), async (req, res, next) => {
         // 저장을 위한 파라미터 입력받기
         const name = req.post('name');
         const stock = req.post('stock');
         const price = req.post('price');
         const category = req.post('category');
-        const thumbnail_photo = req.post('thumbnail_photo');
-        const info_photo = req.post('info_photo');
+        const thumbnail_photo = `/${req.file[0].filename}`;
+        const info_photo = `/${req.file[1].filename}`;
         const prod_info = req.post('prod_info');
         const prod_feature = req.post('prod_feature');
         const reg_date = req.post('reg_date');
+
+        logger.info(thumbnail_photo, info_photo);
 
         if (
             name === null ||
