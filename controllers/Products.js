@@ -13,6 +13,7 @@ const regexHelper = require('../helper/RegexHelper');
 const utilHelper = require('../helper/UtilHelper');
 const multer = require('multer');
 const fs = require('fs');
+const path = require('path');
 
 /** 라우팅 정의 부분 */
 module.exports = (app) => {
