@@ -263,7 +263,7 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO products (name, stock, price, category, prod_info, prod_feature, thumbnail_photo, info_photo, reg_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())';
+                'INSERT INTO products (name, stock, price, category, prod_info, prod_feature, thumbnail_photo, info_photo, reg_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'Y')';
             const input_data = [
                 name,
                 stock,
