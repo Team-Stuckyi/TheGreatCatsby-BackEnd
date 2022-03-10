@@ -26,13 +26,19 @@ module.exports = (app) => {
 
     router.get('/orders/all', async (req, res, next) => {
         //검색어 파라미터 받기 -> 검색어가 없을 경우 전체 목록 조회이므로 유효성 검사 안함
-        const query = req.get('query');
+        const orderIdQuery = req.get('order_id');
+        const orderProdQuery = req.get('name');
+        const orderDateQuery = req.get('order_date');
+        const emailQuery = req.get('email');
+        const orderPriceQuery = req.get('order_price');
+        const orderStatusQuery = req.get('order_status');
 
         //현재 페이지 번호 받기 (기본값은 1)
         const page = req.get('page', 1);
 
         //한 페이지에 보여질 목록 수 받기 (기본값은 10, 최소 10, 최대 30)
         const rows = req.get('rows', 10);
+        
         // 데이터 조회 결과가 저장될 빈 변수
         let json = null;
         let pagenation = null;
@@ -48,10 +54,36 @@ module.exports = (app) => {
 
             let args1 = [];
 
-            if (query != null) {
-                sql1 += " WHERE order_price LIKE ('%', ?, '%')";
-                args1.push(query);
+            if (orderIdQuery != null) {
+                sql1 += " WHERE orders.order_id = ? ";
+                args1.push(orderIdQuery);
             }
+            
+            if (orderProdQuery != null) {
+                sql1 += " WHERE products.name LIKE concat ('%', ?, '%')";
+                args1.push(orderProdQuery);
+            }
+            
+            if (orderDateQuery != null) {
+                sql1 += " WHERE orders.order_date LIKE concat ('%', ?, '%')";
+                args1.push(orderDateQuery);
+            }
+            
+            if (emailQuery != null) {
+                sql1 += " WHERE members.email = ? ";
+                args1.push(emailQuery);
+            }
+            
+            if (orderPriceQuery != null) {
+                sql1 += " WHERE orders.order_price = ? ";
+                args1.push(orderPriceQuery);
+            }
+            
+            if (orderStatusQuery != null) {
+                sql1 += " WHERE orders.order_status = ? ";
+                args1.push(orderStatusQuery);
+            }
+                       
             const [result1] = await dbcon.query(sql1, args1);
             totalCount = result1.length;
 
@@ -64,11 +96,36 @@ module.exports = (app) => {
             //sql 문에 설정할 치환값
             let args2 = [];
 
-            if (query != null) {
-                sql2 += " WHERE order_price LIKE concat ('%', ?, '%')";
-                args2.push(query);
+            if (orderIdQuery != null) {
+                sql2 += " WHERE orders.order_id = ? ";
+                args2.push(orderIdQuery);
             }
-
+            
+            if (orderProdQuery != null) {
+                sql2 += " WHERE products.name LIKE concat ('%', ?, '%')";
+                args2.push(orderProdQuery);
+            }
+            
+            if (orderDateQuery != null) {
+                sql2 += " WHERE orders.order_date LIKE concat ('%', ?, '%')";
+                args2.push(orderDateQuery);
+            }
+            
+            if (emailQuery != null) {
+                sql2 += " WHERE members.email = ? ";
+                args2.push(emailQuery);
+            }
+            
+            if (orderPriceQuery != null) {
+                sql2 += " WHERE orders.order_price = ? ";
+                args2.push(orderPriceQuery);
+            }
+            
+            if (orderStatusQuery != null) {
+                sql2 += " WHERE orders.order_status = ? ";
+                args2.push(orderStatusQuery);
+            }
+            
             sql2 += ' LIMIT ?,?';
             args2.push(pagenation.offset);
             args2.push(pagenation.listCount);

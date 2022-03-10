@@ -25,7 +25,10 @@ module.exports = (app) => {
     /** 전체 목록 조회 */
     router.get('/products/all', async (req, res, next) => {
         // 검색어 파라미터 받기 -> 검색어가 없을 경우 전체 목록 조회이므로 유효성검사 안함
-        const query = req.get('query');
+        const prodIdQuery = req.get('prod_id');
+        const prodNameQuery = req.get('name');
+        const stockQuery = req.get('stock');
+        const statusQuery = req.get('status');
 
         // 현재 페이지 번호 받기 (기본값 1)
         const page = req.get('page', 1);
@@ -49,9 +52,24 @@ module.exports = (app) => {
 
             let args1 = [];
 
-            if (query != null) {
-                sql1 += " WHERE prod_id LIKE concat('%', ?, '%')";
-                args1.push(query);
+            if (prodIdQuery != null) {
+                sql1 += " WHERE prod_id = ? ";
+                args1.push(prodIdQuery);
+            }
+            
+            if (prodNameQuery != null) {
+                sql1 += " WHERE name LIKE concat('%', ?, '%') ";
+                args1.push(prodNameQuery);
+            }
+            
+            if (stockQuery != null) {
+                sql1 += " WHERE stock = ? ";
+                args1.push(stockQuery);
+            }
+            
+            if (statusQuery != null) {
+                sql1 += " WHERE status = ? ";
+                args1.push(statusQuery);
             }
             
             const [result1] = await dbcon.query(sql1, args1);
@@ -67,9 +85,24 @@ module.exports = (app) => {
 
             let args2 = [];
 
-            if (query != null) {
-                sql2 += " WHERE products LIKE concat('%', ?, '%')";
-                args2.push(query);
+            if (prodIdQuery != null) {
+                sql2 += " WHERE prod_id = ? ";
+                args2.push(prodIdQuery);
+            }
+            
+            if (prodNameQuery != null) {
+                sql2 += " WHERE name LIKE concat('%', ?, '%') ";
+                args2.push(prodNameQuery);
+            }
+            
+            if (stockQuery != null) {
+                sql2 += " WHERE stock = ? ";
+                args2.push(stockQuery);
+            }
+            
+            if (statusQuery != null) {
+                sql2 += " WHERE status = ? ";
+                args2.push(statusQuery);
             }
 
             sql2 += ' LIMIT ?, ?';
