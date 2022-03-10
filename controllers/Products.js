@@ -236,7 +236,7 @@ module.exports = (app) => {
         const info_photo = `/${req.file[1].filename}`;
         const prod_info = req.post('prod_info');
         const prod_feature = req.post('prod_feature');
-        const reg_date = req.post('reg_date');
+        const stock = req.post('stock');
 
         logger.info(thumbnail_photo, info_photo);
 
@@ -248,7 +248,6 @@ module.exports = (app) => {
             prod_info === null ||
             prod_feature === null ||
             thumbnail_photo === null ||
-            reg_date === null ||
             info_photo === null
         ) {
             return next(new Error(400));
@@ -265,7 +264,7 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql =
-                'INSERT INTO products (name, stock, price, category, prod_info, prod_feature, thumbnail_photo, info_photo, reg_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                'INSERT INTO products (name, stock, price, category, prod_info, prod_feature, thumbnail_photo, info_photo, reg_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())';
             const input_data = [
                 name,
                 stock,
@@ -275,7 +274,6 @@ module.exports = (app) => {
                 prod_feature,
                 thumbnail_photo,
                 info_photo,
-                reg_date,
             ];
 
             const [result1] = await dbcon.query(sql, input_data);
