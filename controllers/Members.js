@@ -246,12 +246,12 @@ module.exports = (app) => {
      * [POST] /members/address/:user_id
      * 전송 정보 : tel, addr1, addr2
      */
-    router.put("/members/newaddress/:user_id", async (req, res, next) => {
+    router.post("/members/newaddress/:user_id", async (req, res, next) => {
         const user_id = req.get("user_id");
         const tel = req.post("tel");
         const addr1 = req.post("addr1");
         const addr2 = req.post("addr2");
-
+        const name = req.post("name");
         if (
             user_id === null ||
             tel === null ||
@@ -273,7 +273,7 @@ module.exports = (app) => {
 
             // 데이터 수정하기
             const sql =
-                "UPDATE members SET tel=?, addr1=?, addr2=? WHERE user_id=?";
+                "INSERT INTO members (name, tel, addr1, addr2) VALUES (?, ?, ?, ?)";
             const input_data = [tel, addr1, addr2, user_id];
             const [result1] = await dbcon.query(sql, input_data);
 
