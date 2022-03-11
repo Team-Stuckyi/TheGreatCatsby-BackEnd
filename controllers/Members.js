@@ -274,7 +274,7 @@ module.exports = (app) => {
 
             // 데이터 수정하기
             const sql =
-                "INSERT INTO members (name, email, tel, addr2, user_id, password, status, reg_date) VALUES (?, ?, ?, ?, ?, ?, "Y", now())";
+                "INSERT INTO members (name, email, tel, addr2, user_id, password, status, reg_date) VALUES (?, ?, ?, ?, ?, ?, 'Y', now())";
             const input_data = [name, email, tel, addr2, user_id, password, status, reg_date];
             const [result1] = await dbcon.query(sql, input_data);
 
