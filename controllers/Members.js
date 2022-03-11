@@ -271,35 +271,36 @@ module.exports = (app) => {
     try {
         // 데이터베이스 접속
         dbcon = await mysql2.createConnection(config.database);
-        await dbcon.connect();
+            await dbcon.connect();
 
         // 데이터 수정하기
-        const sql =
-            "UPDATE members SET name=?, tel=?, addr1=?, addr2=? where user_id=?";
-        const input_data = [name, tel, addr1, addr2, user_id];
-        const [result1] = await dbcon.query(sql, input_data);
+            const sql =
+                "UPDATE members SET addr1=?, addr1=?, name=?, tel=? WHERE user_id=?";
+            const input_data = [addr1, addr2, name, tel, user_id];
+            const [result1] = await dbcon.query(sql, input_data);
 
-        // 결과 행 수가 0이라면 예외처리
-        if (result1.affectedRows < 1) {
-            throw new Error("수정된 데이터가 없습니다.");
-        }
+            // 결과 행 수가 0이라면 예외처리
+            if (result1.affectedRows < 1) {
+                throw new Error("수정된 데이터가 없습니다.");
+            }
+
 
         // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-        const sql2 =
-            "SELECT user_id, name, tel, addr1, addr2 FROM members WHERE user_id=?";
-        const [result2] = await dbcon.query(sql2, [user_id]);
+            const sql2 =
+                "SELECT user_id, name, addr1, addr2, tel FROM members WHERE user_id=?";
+            const [result2] = await dbcon.query(sql2, [user_id]);
 
-        // 조회 결과를 미리 준비한 변수에 저장함
-        json = result2;
-    } catch (err) {
-        return next(err);
-    } finally {
-        dbcon.end();
-    }
+            // 조회 결과를 미리 준비한 변수에 저장함
+            json = result2;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
 
-    // 모든 처리에 성공했으므로 정상 조회 결과 구성
-    res.sendJson({ item: json });
-});
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson({ item: json });
+    });
 
     /**
      * 관리자 페이지 - 일반 회원 관리
