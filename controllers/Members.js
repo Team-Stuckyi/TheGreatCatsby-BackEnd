@@ -246,60 +246,60 @@ module.exports = (app) => {
      * [POST] /members/address/:user_id
      * 전송 정보 : tel, addr1, addr2
      */
- router.put("/members/newaddress/:user_id", async (req, res, next) => {
-    const user_id = req.get("user_id");
-    const tel = req.post("tel");
-    const name = req.post("name");
-    const addr1 = req.post("addr1");
-    const addr2 = req.post("addr2");
+     router.put("/members/newaddr/:user_id", async (req, res, next) => {
+        const user_id = req.get("user_id");
+        const tel = req.post("tel");
+        const name = req.post("name");
+        const addr1 = req.post("addr1");
+        const addr2 = req.post("addr2");
 
-    if (
-        user_id === null ||
-        tel === null ||
-        name === null ||
-        addr1 === null ||
-        addr2 === null 
-    ) {
-        //  400 Bad Request -> 잘못된 요청
-        return next(new Error(400));
-    }
-
-    /** 데이터 수정하기 */
-    // 데이터 조회 결과가 저장될 빈 변수
-    let json = null;
-
-    try {
-        // 데이터베이스 접속
-        dbcon = await mysql2.createConnection(config.database);
-        await dbcon.connect();
-
-        // 데이터 수정하기
-        const sql =
-            'UPDATE members SET name=?, tel=?, addr1=?, addr2=? where user_id=?';
-        const input_data = [name, tel, addr1, addr2, user_id];
-        const [result1] = await dbcon.query(sql, input_data);
-
-        // 결과 행 수가 0이라면 예외처리
-        if (result1.affectedRows < 1) {
-            throw new Error("수정된 데이터가 없습니다.");
+        if (
+            user_id === null ||
+            tel === null ||
+            name === null ||
+            addr1 === null ||
+            addr2 === null 
+        ) {
+            //  400 Bad Request -> 잘못된 요청
+            return next(new Error(400));
         }
 
-        // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-        const sql2 =
-            'SELECT name, tel, addr1, addr2 FROM members WHERE user_id=?';
-        const [result2] = await dbcon.query(sql2, [user_id]);
+        /** 데이터 수정하기 */
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
 
-        // 조회 결과를 미리 준비한 변수에 저장함
-        json = result2;
-    } catch (err) {
-        return next(err);
-    } finally {
-        dbcon.end();
-    }
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
 
-    // 모든 처리에 성공했으므로 정상 조회 결과 구성
-    res.sendJson({ item: json });
-});
+            // 데이터 수정하기
+            const sql =
+                'UPDATE members SET name=?, tel=?, addr1=?, addr2=? where user_id=?';
+            const input_data = [name, tel, addr1, addr2, user_id];
+            const [result1] = await dbcon.query(sql, input_data);
+
+            // 결과 행 수가 0이라면 예외처리
+            if (result1.affectedRows < 1) {
+                throw new Error("수정된 데이터가 없습니다.");
+            }
+
+            // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
+            const sql2 =
+                'SELECT name, tel, addr1, addr2 FROM members WHERE user_id=?';
+            const [result2] = await dbcon.query(sql2, [user_id]);
+
+            // 조회 결과를 미리 준비한 변수에 저장함
+            json = result2;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
+
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson({ item: json });
+    });
 
     /**
      * 관리자 페이지 - 일반 회원 관리
