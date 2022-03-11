@@ -251,11 +251,13 @@ module.exports = (app) => {
         const tel = req.post("tel");
         const addr2 = req.post("addr2");
         const name = req.post("name");
+        const email = req.post("email");
         if (
             user_id === null ||
             tel === null ||
             name === null ||
-            addr2 === null
+            addr2 === null ||
+            email === null
         ) {
             //  400 Bad Request -> 잘못된 요청
             return next(new Error(400));
