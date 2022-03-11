@@ -247,7 +247,7 @@ module.exports = (app) => {
      * 전송 정보 : tel, addr1, addr2
      */
     router.post("/members/newaddress/:user_id", async (req, res, next) => {
-        const user_id = req.get("user_id");
+        const user_id = req.post("user_id");
         const tel = req.post("tel");
         const addr2 = req.post("addr2");
         const name = req.post("name");
