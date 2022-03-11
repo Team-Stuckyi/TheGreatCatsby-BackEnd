@@ -273,8 +273,8 @@ module.exports = (app) => {
 
             // 데이터 수정하기
             const sql =
-                "INSERT INTO members (name, tel, addr1, addr2) VALUES (?, ?, ?, ?)";
-            const input_data = [tel, addr1, addr2, user_id];
+                "INSERT INTO members (name, tel, addr2, user_id) VALUES (?, ?, ?, ?)";
+            const input_data = [name, tel, addr2, user_id];
             const [result1] = await dbcon.query(sql, input_data);
 
             // 결과 행 수가 0이라면 예외처리
