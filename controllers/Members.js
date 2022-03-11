@@ -252,12 +252,14 @@ module.exports = (app) => {
         const addr2 = req.post("addr2");
         const name = req.post("name");
         const email = req.post("email");
+        const password = req.post("password");
         if (
             user_id === null ||
             tel === null ||
             name === null ||
             addr2 === null ||
-            email === null
+            email === null ||
+            password === null
         ) {
             //  400 Bad Request -> 잘못된 요청
             return next(new Error(400));
@@ -285,7 +287,7 @@ module.exports = (app) => {
 
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
             const sql2 =
-                "SELECT user_id, name, status, tel, addr1, addr2 FROM members WHERE user_id=?";
+                "SELECT user_id, name, email, status, tel, addr1, addr2 FROM members WHERE user_id=?";
             const [result2] = await dbcon.query(sql2, [result1.insertId]);
 
             // 조회 결과를 미리 준비한 변수에 저장함
