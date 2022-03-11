@@ -249,13 +249,12 @@ module.exports = (app) => {
     router.post("/members/newaddress/:user_id", async (req, res, next) => {
         const user_id = req.get("user_id");
         const tel = req.post("tel");
-        const addr1 = req.post("addr1");
         const addr2 = req.post("addr2");
         const name = req.post("name");
         if (
             user_id === null ||
             tel === null ||
-            addr1 === null ||
+            name === null ||
             addr2 === null
         ) {
             //  400 Bad Request -> 잘못된 요청
