@@ -254,12 +254,9 @@ module.exports = (app) => {
         const email = req.post("email");
         const password = req.post("password");
         if (
-            user_id === null ||
             tel === null ||
             name === null ||
             addr2 === null ||
-            email === null ||
-            password === null
         ) {
             //  400 Bad Request -> 잘못된 요청
             return next(new Error(400));
@@ -276,8 +273,8 @@ module.exports = (app) => {
 
             // 데이터 수정하기
             const sql =
-                "INSERT INTO members (name, tel, addr2, user_id) VALUES (?, ?, ?, ?)";
-            const input_data = [name, tel, addr2, user_id];
+                "INSERT INTO members (name, email, tel, addr2, user_id, status, reg_date) VALUES (?, ?, ?, ?, ?, "Y", now())";
+            const input_data = [name, tel, addr2];
             const [result1] = await dbcon.query(sql, input_data);
 
             // 결과 행 수가 0이라면 예외처리
