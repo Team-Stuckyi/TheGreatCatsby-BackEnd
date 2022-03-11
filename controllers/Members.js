@@ -253,6 +253,8 @@ module.exports = (app) => {
         const name = req.post("name");
         const email = req.post("email");
         const password = req.post("password");
+        const status = req.post("status");
+        const reg_date = req.post("reg_date");
         if (
             tel === null ||
             name === null ||
