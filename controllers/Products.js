@@ -279,7 +279,7 @@ module.exports = (app) => {
             ];
 
             const [result1] = await dbcon.query(sql, input_data);
-
+            logger.info(JSON.stringify(result));
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
             const sql2 =
                 'SELECT prod_id, name, stock, price, category, prod_info, prod_feature, thumbnail_photo, info_photo, reg_date FROM products WHERE prod_id=?';
