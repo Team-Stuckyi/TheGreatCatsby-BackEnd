@@ -280,7 +280,7 @@ module.exports = (app) => {
 
             // 데이터 수정하기
             const sql =
-                "INSERT INTO members (name, email, tel, addr2, user_id, password, status, reg_date) VALUES (?, ?, ?, ?, ?, ?, ?, now())";
+                'INSERT INTO members (name, email, tel, addr2, user_id, password, status, reg_date) VALUES (?, ?, ?, ?, ?, ?, ?, now())';
             const input_data = [name, email, tel, addr2, user_id, password, status, reg_date];
             const [result1] = await dbcon.query(sql, input_data);
 
@@ -291,7 +291,7 @@ module.exports = (app) => {
 
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
             const sql2 =
-                "SELECT user_id, name, tel, addr1, addr2 FROM members WHERE user_id=?";
+                'SELECT user_id, name, tel, addr1, addr2 FROM members WHERE user_id=?';
             const [result2] = await dbcon.query(sql2, [user_id]);
 
             // 조회 결과를 미리 준비한 변수에 저장함
