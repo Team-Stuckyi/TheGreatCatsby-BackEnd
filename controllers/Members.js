@@ -258,7 +258,12 @@ module.exports = (app) => {
         if (
             tel === null ||
             name === null ||
+            user_id === null ||
+            email === null ||
             addr2 === null ||
+            password === null ||
+            reg_date === null ||
+            status === null ||
         ) {
             //  400 Bad Request -> 잘못된 요청
             return next(new Error(400));
