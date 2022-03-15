@@ -198,8 +198,8 @@ module.exports = (app) => {
      * [PUTS] /members/newaddr/:user_id
      * 전송 정보 : tel, addr1, addr2
      */
-    router.put("/members/newaddr/:user_id", async (req, res, next) => {
-        const user_id = req.get("user_id");
+    router.put("/members/newaddr/:userid", async (req, res, next) => {
+        const user_id = req.get("userid");
         const tel = req.post("tel");
         const addr1 = req.post("addr1");
         const addr2 = req.post("addr2");
