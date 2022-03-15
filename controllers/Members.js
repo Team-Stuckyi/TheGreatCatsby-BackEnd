@@ -307,17 +307,15 @@ module.exports = (app) => {
      */
     router.put("/members/newname/:user_id", async (req, res, next) => {
         const user_id = req.get("user_id");
-        const addr1 = req.post("addr1");
-        const addr2 = req.post("addr2");
         const name = req.post("name");
         const tel = req.post("tel");
-
+        const addr1 = req.post("addr1");
+       
         if (
             user_id === null ||
             name === null ||
             tel === null ||
-            addr1 === null ||
-            addr2 === null
+            addr1 === null
         ) {
             //  400 Bad Request -> 잘못된 요청
             return next(new Error(400));
@@ -334,8 +332,8 @@ module.exports = (app) => {
 
             // 데이터 수정하기
             const sql =
-                "UPDATE members SET addr1=?, addr2=?, name=?, tel=? WHERE user_id=?";
-            const input_data = [addr1, addr2, name, tel, user_id];
+                "UPDATE members SET addr1=?, name=?, tel=? WHERE user_id=?";
+            const input_data = [addr1, name, tel, user_id];
             const [result1] = await dbcon.query(sql, input_data);
 
             // 결과 행 수가 0이라면 예외처리
@@ -345,7 +343,7 @@ module.exports = (app) => {
 
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
             const sql2 =
-                "SELECT user_id, name, addr1, addr2, tel FROM members WHERE user_id=?";
+                "SELECT user_id, name, addr1, tel FROM members WHERE user_id=?";
             const [result2] = await dbcon.query(sql2, [user_id]);
 
             // 조회 결과를 미리 준비한 변수에 저장함
