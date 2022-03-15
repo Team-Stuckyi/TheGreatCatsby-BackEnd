@@ -190,7 +190,6 @@ module.exports = (app) => {
         res.sendJson({ item: json });
     });
 
-
     /** =-=-=-=-=-=-=-=-=-=-= router.put =-=-=-=-=-=-=-=-=-=-=  */
 
     /**
@@ -259,13 +258,7 @@ module.exports = (app) => {
      * 전송 정보 : tel, addr1, addr2
      */
 
-    /**
-     * 관리자 페이지 - 일반 회원 관리
-     * 사용자 정보 수정
-     * [PUT] /members/address/:user_id
-     * 수정 정보 : email, name,  tel
-     */
-    router.put("/members/newaddr/:user_id", async (req, res, next) => {
+    router.put("/members/new/:user_id", async (req, res, next) => {
         const user_id = req.get("user_id");
         const tel = req.post("tel");
         const addr1 = req.post("addr1");
