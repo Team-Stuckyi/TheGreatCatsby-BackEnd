@@ -257,15 +257,14 @@ module.exports = (app) => {
      * [POST] /members/address/:user_id
      * 전송 정보 : tel, addr1, addr2
      */
-
-    router.put("/members/new/:user_id", async (req, res, next) => {
-        const user_id = req.get("user_id");
-        const tel = req.post("tel");
-        const addr1 = req.post("addr1");
-        const addr2 = req.post("addr2");
+    router.put("/members/newaddr/:userid", async (req, res, next) => {
+        const userid = req.get("user_id");
+        const tel = req.put("tel");
+        const addr1 = req.put("addr1");
+        const addr2 = req.put("addr2");
 
         if (
-            user_id === null ||
+            userid === null ||
             tel === null ||
             addr1 === null ||
             addr2 === null
@@ -286,7 +285,7 @@ module.exports = (app) => {
             // 데이터 수정하기
             const sql =
                 "UPDATE members SET tel=?, addr1=?, addr2=? WHERE user_id=?";
-            const input_data = [tel, addr1, addr2, user_id];
+            const input_data = [tel, addr1, addr2, userid];
             const [result1] = await dbcon.query(sql, input_data);
 
             // 결과 행 수가 0이라면 예외처리
@@ -297,7 +296,7 @@ module.exports = (app) => {
             // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
             const sql2 =
                 "SELECT user_id, name, status, tel, addr1, addr2 FROM members WHERE user_id=?";
-            const [result2] = await dbcon.query(sql2, [user_id]);
+            const [result2] = await dbcon.query(sql2, [userid]);
 
             // 조회 결과를 미리 준비한 변수에 저장함
             json = result2;
