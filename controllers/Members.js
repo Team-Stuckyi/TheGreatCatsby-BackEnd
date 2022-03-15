@@ -193,6 +193,65 @@ module.exports = (app) => {
     /** =-=-=-=-=-=-=-=-=-=-= router.put =-=-=-=-=-=-=-=-=-=-=  */
 
     /**
+     * 사용자 페이지 - 결제 페이지
+     * 신규 배송 입력시 업데이트
+     * [PUTS] /members/newaddr/:user_id
+     * 전송 정보 : tel, addr1, addr2
+     */
+    router.put("/members/newaddr/:user_id", async (req, res, next) => {
+        const user_id = req.get("user_id");
+        const tel = req.put("tel");
+        const addr1 = req.put("addr1");
+        const addr2 = req.put("addr2");
+
+        if (
+            user_id === null ||
+            tel === null ||
+            addr1 === null ||
+            addr2 === null
+        ) {
+            //  400 Bad Request -> 잘못된 요청
+            return next(new Error(400));
+        }
+
+        /** 데이터 수정하기 */
+        // 데이터 조회 결과가 저장될 빈 변수
+        let json = null;
+
+        try {
+            // 데이터베이스 접속
+            dbcon = await mysql2.createConnection(config.database);
+            await dbcon.connect();
+
+            // 데이터 수정하기
+            const sql =
+                "UPDATE members SET tel=?, addr1=?, addr2=? WHERE user_id=?";
+            const input_data = [tel, addr1, addr2, user_id];
+            const [result1] = await dbcon.query(sql, input_data);
+
+            // 결과 행 수가 0이라면 예외처리
+            if (result1.affectedRows < 1) {
+                throw new Error("수정된 데이터가 없습니다.");
+            }
+
+            // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
+            const sql2 =
+                "SELECT user_id, name, status, tel, addr1, addr2 FROM members WHERE user_id=?";
+            const [result2] = await dbcon.query(sql2, [user_id]);
+
+            // 조회 결과를 미리 준비한 변수에 저장함
+            json = result2;
+        } catch (err) {
+            return next(err);
+        } finally {
+            dbcon.end();
+        }
+
+        // 모든 처리에 성공했으므로 정상 조회 결과 구성
+        res.sendJson({ item: json });
+    });
+
+    /**
      * 관리자 페이지 - 일반 회원 관리
      * 사용자 정보 수정
      * [PUT] /members/address/:user_id
@@ -238,65 +297,6 @@ module.exports = (app) => {
             const sql2 =
                 "SELECT user_id, name, email, tel FROM members WHERE user_id=?";
             const [result2] = await dbcon.query(sql2, [user_id]);
-
-            // 조회 결과를 미리 준비한 변수에 저장함
-            json = result2;
-        } catch (err) {
-            return next(err);
-        } finally {
-            dbcon.end();
-        }
-
-        // 모든 처리에 성공했으므로 정상 조회 결과 구성
-        res.sendJson({ item: json });
-    });
-
-    /**
-     * 사용자 페이지 - 결제 페이지
-     * 신규 배송 입력시 업데이트
-     * [POST] /members/address/:user_id
-     * 전송 정보 : tel, addr1, addr2
-     */
-    router.put("/members/newaddr/:userid", async (req, res, next) => {
-        const userid = req.get("user_id");
-        const tel = req.put("tel");
-        const addr1 = req.put("addr1");
-        const addr2 = req.put("addr2");
-
-        if (
-            userid === null ||
-            tel === null ||
-            addr1 === null ||
-            addr2 === null
-        ) {
-            //  400 Bad Request -> 잘못된 요청
-            return next(new Error(400));
-        }
-
-        /** 데이터 수정하기 */
-        // 데이터 조회 결과가 저장될 빈 변수
-        let json = null;
-
-        try {
-            // 데이터베이스 접속
-            dbcon = await mysql2.createConnection(config.database);
-            await dbcon.connect();
-
-            // 데이터 수정하기
-            const sql =
-                "UPDATE members SET tel=?, addr1=?, addr2=? WHERE user_id=?";
-            const input_data = [tel, addr1, addr2, userid];
-            const [result1] = await dbcon.query(sql, input_data);
-
-            // 결과 행 수가 0이라면 예외처리
-            if (result1.affectedRows < 1) {
-                throw new Error("수정된 데이터가 없습니다.");
-            }
-
-            // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-            const sql2 =
-                "SELECT user_id, name, status, tel, addr1, addr2 FROM members WHERE user_id=?";
-            const [result2] = await dbcon.query(sql2, [userid]);
 
             // 조회 결과를 미리 준비한 변수에 저장함
             json = result2;
