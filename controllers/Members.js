@@ -295,10 +295,14 @@ module.exports = (app) => {
      * 전송 정보 : tel, addr1, addr2
      */
     router.put('/members/name/:user_id', async (req, res, next) => {
+        logger.debug('로그 테스트1');
         const user_id = req.get('user_id');
-        const tel = req.put('tel');
-        const addr1 = req.put('addr1');
-        const addr2 = req.put('addr2');
+        const tel = req.post('tel');
+        const addr1 = req.post('addr1');
+        const addr2 = req.post('addr2');
+
+        logger.debug('로그 테스트2');
+
         if (user_id === null || tel === null || addr1 === null || addr2 === null) {
             //  400 Bad Request -> 잘못된 요청
             return next(new Error(400));
@@ -307,6 +311,7 @@ module.exports = (app) => {
         // 데이터 조회 결과가 저장될 빈 변수
         let json = null;
         try {
+            logger.debug('로그 테스트3');
             // 데이터베이스 접속
             dbcon = await mysql2.createConnection(config.database);
             await dbcon.connect();
@@ -329,6 +334,7 @@ module.exports = (app) => {
         } finally {
             dbcon.end();
         }
+        logger.debug('로그 테스트4');
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
         res.sendJson({ item: json });
     });
