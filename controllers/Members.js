@@ -259,7 +259,7 @@ module.exports = (app) => {
      */
 
     router.put("/members/new/:user_id", async (req, res, next) => {
-        const user_id = req.get("user_id");
+        const user_id = req.post("user_id");
         const tel = req.post("tel");
         const addr1 = req.post("addr1");
         const addr2 = req.post("addr2");
