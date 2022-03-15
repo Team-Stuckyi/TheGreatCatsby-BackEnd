@@ -305,7 +305,7 @@ module.exports = (app) => {
      * [POST] /members/address/:user_id
      * 전송 정보 : tel, addr1, addr2
      */
-    router.put("/members/name/:user_id", async (req, res, next) => {
+    router.put("/members/newaddr/:user_id", async (req, res, next) => {
         const user_id = req.get("user_id");
         const tel = req.post("tel");
         const addr1 = req.post("addr1");
