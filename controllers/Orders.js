@@ -255,7 +255,7 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql1 =
-                'INSERT INTO orders (order_price, order_date, order_select, order_count, prod_id, user_id) VALUES (?, now(), ?, ?, ?, ?) where user_id = ?';
+                'INSERT INTO orders (order_price, order_date, order_select, order_count, prod_id, user_id) VALUES (?, now(), ?, ?, ?, ?)';
 
             const input_data1 = [
                 order_price,
