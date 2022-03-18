@@ -227,8 +227,8 @@ module.exports = (app) => {
      * 전송 정보 : order_price, order_date, order_select, order_count, member => name, member => email, products
      */
 
-    router.post('/orders/post/:user_id', async (req, res, next) => {
-        const user_id = req.get("user_id");
+    router.post('/orders/post/:userid', async (req, res, next) => {
+        const user_id = req.get("userid");
         // 저장을 위한 파라미터 입력받기
         const order_price = req.post('order_price');
         const order_date = req.post('order_date');
