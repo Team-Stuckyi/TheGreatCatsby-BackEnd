@@ -52,8 +52,8 @@ module.exports = (app) => {
      * [GET] /members/address
      * 전송 정보 : tel, addr1, addr2
      */
-    router.get("/members/address/:user_id", async (req, res, next) => {
-        const user_id = req.get("user_id");
+    router.get("/members/address/:userid", async (req, res, next) => {
+        const user_id = req.get("userid");
         // 데이터 조회 결과가 저장될 빈 변수
         let json = null;
 
