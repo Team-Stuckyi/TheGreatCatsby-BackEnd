@@ -243,9 +243,7 @@ module.exports = (app) => {
         // } catch (err) {
         //     return next(err);
         // }
-        if (order_price === null || order_date === null || order_select === null || order_count === null || prodid === null || userid === null) {
-            return next(new Error(400));
-        }
+        
 
         /** 데이터 저장하기 */
         // 데이터 조회 결과가 저장될 빈 변수
