@@ -233,7 +233,6 @@ module.exports = (app) => {
         const order_price = req.post('order_price');
         const order_date = req.post('order_date');
         const order_select = req.post('order_select');
-        const order_count = req.post('order_count');
         const prodid = req.post('prod_id');
         const userid = req.post('user_id');
         // try {
@@ -255,13 +254,12 @@ module.exports = (app) => {
 
             // 데이터 저장하기
             const sql1 =
-                "INSERT INTO orders (order_price, order_date, order_select, order_count, prod_id, user_id) VALUES (?, now(), 'T', ?, ?, ?)";
+                "INSERT INTO orders (order_price, order_date, order_select, prod_id, user_id) VALUES (?, now(), 'T', ?, ?)";
 
             const input_data1 = [
                 order_price,
                 order_date,
                 order_select,
-                order_count,
                 prodid,
                 userid,
             ];
