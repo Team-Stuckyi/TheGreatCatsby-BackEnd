@@ -265,7 +265,8 @@ module.exports = (app) => {
             ];
             const [result1] = await dbcon.query(sql1, input_data1);
 
-            const sql2 = "SELECT COUNT(order_id) FROM orders WHERE user_id =?;";
+            const sql2 =
+                "SELECT COUNT(order_id) AS lastOrderId FROM orders WHERE user_id =?;";
 
             const [result2] = await dbcon.query(sql2, [userid]);
             json = result2;
