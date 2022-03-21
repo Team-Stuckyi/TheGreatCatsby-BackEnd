@@ -86,12 +86,11 @@ module.exports = (app) => {
      */
     router.post("/members/join", async (req, res, next) => {
         // 저장을 위한 파라미터 입력받기
-        const user_id = req.get("user_id");
         const email = req.post("email");
         const password = req.post("password");
         const name = req.post("name");
 
-        if (email === null) {
+        if (email === null || password === null || name === null) {
             return next(new Error(400));
         }
 
@@ -128,7 +127,6 @@ module.exports = (app) => {
         } finally {
             dbcon.end();
         }
-
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
         res.sendJson({ item: json });
     });
