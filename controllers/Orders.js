@@ -253,19 +253,22 @@ module.exports = (app) => {
             await dbcon.connect();
 
             // 데이터 저장하기
-            const sql =
+            const sql1 =
                 "INSERT INTO orders (order_price, order_date, order_select, order_count, prod_id, user_id) VALUES (?, now(), ?, ?, ?, ?)";
 
-            const input_data = [
+            const input_data1 = [
                 order_price,
                 order_select,
                 order_count,
                 prodid,
                 userid,
             ];
-            const [result1] = await dbcon.query(sql, input_data);
+            const [result1] = await dbcon.query(sql1, input_data1);
 
-            json = result1;
+            const sql2 = "SELECT COUNT(order_id) FROM orders WHERE user_id =?;";
+
+            const [result2] = await dbcon.query(sql2, [userid]);
+            json = result2;
         } catch (err) {
             return next(err);
         } finally {
