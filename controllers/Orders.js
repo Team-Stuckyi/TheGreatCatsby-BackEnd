@@ -237,13 +237,13 @@ module.exports = (app) => {
      * 전송 정보 : order_price, order_date, order_select, order_count, member => name, member => email, products
      */
 
-    router.post("/orders/post/:userid", async (req, res, next) => {
+    router.post("/orders/post", async (req, res, next) => {
         // 저장을 위한 파라미터 입력받기
         const order_price = req.post("order_price");
         const order_select = req.post("order_select");
         const order_count = req.post("order_count");
-        const prodid = req.post("prod_id");
-        const userid = req.post("user_id");
+        const prod_id = req.post("prod_id");
+        const user_id = req.post("user_id");
 
         let json = null;
 
@@ -260,15 +260,15 @@ module.exports = (app) => {
                 order_price,
                 order_select,
                 order_count,
-                prodid,
-                userid,
+                prod_id,
+                user_id,
             ];
             const [result1] = await dbcon.query(sql1, input_data1);
 
             const sql2 =
                 "SELECT COUNT(order_id) AS lastOrderId FROM orders WHERE user_id =?;";
 
-            const [result2] = await dbcon.query(sql2, [userid]);
+            const [result2] = await dbcon.query(sql2, [user_id]);
             json = result2;
         } catch (err) {
             return next(err);
