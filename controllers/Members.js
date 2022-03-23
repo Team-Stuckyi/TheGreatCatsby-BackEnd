@@ -64,7 +64,7 @@ module.exports = (app) => {
 
             // 전체 데이터 수를 조회
             let sql =
-                "SELECT user_id, tel, addr1, addr2, DATE_FORMAT(reg_date, '%Y-%m-%d') AS reg_date FROM members WHERE user_id=?";
+                "SELECT user_id, name, tel, addr1, addr2, DATE_FORMAT(reg_date, '%Y-%m-%d') AS reg_date FROM members WHERE user_id=?";
             const [result] = await dbcon.query(sql, [user_id]);
             json = result;
         } catch (err) {
