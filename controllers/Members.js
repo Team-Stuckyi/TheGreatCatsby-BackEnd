@@ -196,12 +196,13 @@ module.exports = (app) => {
         const tel = req.post("tel");
         const addr1 = req.post("addr1");
         const addr2 = req.post("addr2");
-
+        const name = req.post("name");
         if (
             user_id === null ||
             tel === null ||
             addr1 === null ||
-            addr2 === null
+            addr2 === null ||
+            name === null
         ) {
             //  400 Bad Request -> 잘못된 요청
             return next(new Error(400));
@@ -218,8 +219,8 @@ module.exports = (app) => {
 
             // 데이터 수정하기
             const sql =
-                "UPDATE members SET tel=?, addr1=?, addr2=? WHERE user_id=?";
-            const input_data = [tel, addr1, addr2, user_id];
+                "UPDATE members SET tel=?, addr1=?, addr2=?, name=? WHERE user_id=?";
+            const input_data = [tel, addr1, addr2, name, user_id];
             const [result1] = await dbcon.query(sql, input_data);
 
             // 결과 행 수가 0이라면 예외처리
