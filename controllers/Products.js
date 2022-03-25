@@ -18,25 +18,8 @@ const path = require('path');
 /** 라우팅 정의 부분 */
 module.exports = (app) => {
     let dbcon = null;
-    fs.readdir('_files/uploads', (error) => {
-        // uploads 폴더 없으면 생성
-        if (error) {
-            fs.mkdirSync('_files/uploads');
-        }
-    });
 
-    const upload = multer({
-        storage: multer.diskStorage({
-            destination(req, file, cb) {
-                cb(null, '_files/uploads/');
-            },
-            filename(req, file, cb) {
-                const ext = path.extname(file.originalname);
-                cb(null, 'img' + Date.now() + ext);
-            },
-        }),
-        limits: { fileSize: 5 * 1024 * 1024 },
-    });
+    /** =-=-=-=-=-=-=-=-=-=-= router.GET =-=-=-=-=-=-=-=-=-=-=  */
 
     /**
      * 관리자 페이지 - 일반 상품 관리 페이지
@@ -70,30 +53,30 @@ module.exports = (app) => {
 
             // 전체 데이터 수를 조회
             let sql1 =
-                "SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products";
+                'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
 
             let args1 = [];
 
             if (prodIdQuery != null) {
-                sql1 += " WHERE prod_id = ? ";
+                sql1 += ' WHERE prod_id = ? ';
                 args1.push(prodIdQuery);
             }
-            
+
             if (prodNameQuery != null) {
                 sql1 += " WHERE name LIKE concat('%', ?, '%') ";
                 args1.push(prodNameQuery);
             }
-            
+
             if (stockQuery != null) {
-                sql1 += " WHERE stock = ? ";
+                sql1 += ' WHERE stock = ? ';
                 args1.push(stockQuery);
             }
-            
+
             if (statusQuery != null) {
-                sql1 += " WHERE status = ? ";
+                sql1 += ' WHERE status = ? ';
                 args1.push(statusQuery);
             }
-            
+
             const [result1] = await dbcon.query(sql1, args1);
             totalCount = result1.length;
 
@@ -103,27 +86,27 @@ module.exports = (app) => {
 
             // 데이터 조회
             let sql2 =
-                "SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products";
+                'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
 
             let args2 = [];
 
             if (prodIdQuery != null) {
-                sql2 += " WHERE prod_id = ? ";
+                sql2 += ' WHERE prod_id = ? ';
                 args2.push(prodIdQuery);
             }
-            
+
             if (prodNameQuery != null) {
                 sql2 += " WHERE name LIKE concat('%', ?, '%') ";
                 args2.push(prodNameQuery);
             }
-            
+
             if (stockQuery != null) {
-                sql2 += " WHERE stock = ? ";
+                sql2 += ' WHERE stock = ? ';
                 args2.push(stockQuery);
             }
-            
+
             if (statusQuery != null) {
-                sql2 += " WHERE status = ? ";
+                sql2 += ' WHERE status = ? ';
                 args2.push(statusQuery);
             }
 
@@ -143,37 +126,6 @@ module.exports = (app) => {
 
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
         res.sendJson({ pagenation: pagenation, item: json, totalCount: totalCount });
-    });
-    
-    
-    /**
-     * 사용자 페이지 - 사용자 페이지 - 메인페이지
-     * 상품 정보를 화면에 보여주는 데이터
-     * [GET] /products
-     * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_id, review_count, star_avg
-     */
-    /** 전체 목록 조회 */
-    router.get('/products/main', async (req, res, next) => {
-        // 데이터 조회 결과가 저장될 빈 변수
-        let json = null;
-
-        try {
-            // 데이터베이스 접속
-            dbcon = await mysql2.createConnection(config.database);
-            await dbcon.connect();
-
-            // 전체 데이터 수를 조회
-            let sql =
-                'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
-            const [result] = await dbcon.query(sql);
-            json = result;
-        } catch (err) {
-            return next(err);
-        } finally {
-            dbcon.end();
-        }
-
-        res.sendJson({ item: json });
     });
 
     /**
@@ -213,48 +165,14 @@ module.exports = (app) => {
         res.sendJson({ item: json });
     });
 
-   
-    
-    /* */
-    
-    
-    
     /**
-     * 관리자 페이지 - 일반 상품 관리 페이지
-     * 사용자 정보를 화면에 보여주는 데이터
-     * [POST] /products
-     * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, review_id, review_count, star_avg
+     * 사용자 페이지 - 사용자 페이지 - 메인페이지
+     * 상품 정보를 화면에 보여주는 데이터
+     * [GET] /products
+     * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_id, review_count, star_avg
      */
-    /** 데이터 추가 --> Create(INSERT) */
-    
-    router.post('/products', upload.fields([{name: 'thumbImage'}, {name: 'infoImage'}]), async (req, res, next) => {
-        // 저장을 위한 파라미터 입력받기
-        const name = req.post('name');
-        const stock = req.post('stock');
-        const price = req.post('price');
-        const category = req.post('category');
-        const thumbnail_photo = `/${req.files['thumbImage'][0].filename}`;
-        const info_photo = `/${req.files['infoImage'][0].filename}`;
-        const prod_info = req.post('prod_info');
-        const prod_feature = req.post('prod_feature');
-        const status = 'Y';
-
-        logger.info(thumbnail_photo, info_photo);
-
-        if (
-            name === null ||
-            stock === null ||
-            price === null ||
-            category === null ||
-            prod_info === null ||
-            prod_feature === null ||
-            thumbnail_photo === null ||
-            info_photo === null
-        ) {
-            return next(new Error(400));
-        }
-
-        /** 데이터 저장하기 */
+    /** 전체 목록 조회 */
+    router.get('/products/main', async (req, res, next) => {
         // 데이터 조회 결과가 저장될 빈 변수
         let json = null;
 
@@ -263,40 +181,126 @@ module.exports = (app) => {
             dbcon = await mysql2.createConnection(config.database);
             await dbcon.connect();
 
-            // 데이터 저장하기
-            const sql =
-                'INSERT INTO products (name, stock, price, category, prod_info, prod_feature, thumbnail_photo, info_photo, reg_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)';
-            const input_data = [
-                name,
-                stock,
-                price,
-                category,
-                prod_info,
-                prod_feature,
-                thumbnail_photo,
-                info_photo,
-                status
-            ];
-
-            const [result1] = await dbcon.query(sql, input_data);
-            logger.info(JSON.stringify(result1));
-            // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
-            const sql2 =
-                'SELECT prod_id, name, stock, price, category, prod_info, prod_feature, thumbnail_photo, info_photo, reg_date FROM products WHERE prod_id=?';
-
-            const [result2] = await dbcon.query(sql2, [result1.insertId]);
-
-            // 조회결과를 미리 준비한 변수에 저장함
-            json = result2;
+            // 전체 데이터 수를 조회
+            let sql =
+                'SELECT prod_id, name, stock, status, price, category, thumbnail_photo, info_photo, prod_info, prod_feature, reg_date, review_count, stars_avg FROM products';
+            const [result] = await dbcon.query(sql);
+            json = result;
         } catch (err) {
             return next(err);
         } finally {
             dbcon.end();
         }
 
-        // 모든 처리에 성공했으므로 정상 조회 결과 구성
         res.sendJson({ item: json });
     });
+
+    /** =-=-=-=-=-=-=-=-=-=-= router.POST =-=-=-=-=-=-=-=-=-=-=  */
+
+    /**
+     * 관리자 페이지 - 일반 상품 관리 페이지
+     * 사용자 정보를 화면에 보여주는 데이터
+     * [POST] /products
+     * 전송 정보 : prod_id, name, stock, status, price, category, tumbnail_photo, info_photo, prod_info, prod_feature, review_id, review_count, star_avg
+     */
+    /** 데이터 추가 --> Create(INSERT) */
+
+    fs.readdir('_files/uploads', (error) => {
+        // uploads 폴더 없으면 생성
+        if (error) {
+            fs.mkdirSync('_files/uploads');
+        }
+    });
+
+    const upload = multer({
+        storage: multer.diskStorage({
+            destination(req, file, cb) {
+                cb(null, '_files/uploads/');
+            },
+            filename(req, file, cb) {
+                const ext = path.extname(file.originalname);
+                cb(null, 'img' + Date.now() + ext);
+            },
+        }),
+        limits: { fileSize: 5 * 1024 * 1024 },
+    });
+
+    router.post(
+        '/products',
+        upload.fields([{ name: 'thumbImage' }, { name: 'infoImage' }]),
+        async (req, res, next) => {
+            // 저장을 위한 파라미터 입력받기
+            const name = req.post('name');
+            const stock = req.post('stock');
+            const price = req.post('price');
+            const category = req.post('category');
+            const thumbnail_photo = `/${req.files['thumbImage'][0].filename}`;
+            const info_photo = `/${req.files['infoImage'][0].filename}`;
+            const prod_info = req.post('prod_info');
+            const prod_feature = req.post('prod_feature');
+            const status = 'Y';
+
+            logger.info(thumbnail_photo, info_photo);
+
+            if (
+                name === null ||
+                stock === null ||
+                price === null ||
+                category === null ||
+                prod_info === null ||
+                prod_feature === null ||
+                thumbnail_photo === null ||
+                info_photo === null
+            ) {
+                return next(new Error(400));
+            }
+
+            /** 데이터 저장하기 */
+            // 데이터 조회 결과가 저장될 빈 변수
+            let json = null;
+
+            try {
+                // 데이터베이스 접속
+                dbcon = await mysql2.createConnection(config.database);
+                await dbcon.connect();
+
+                // 데이터 저장하기
+                const sql =
+                    'INSERT INTO products (name, stock, price, category, prod_info, prod_feature, thumbnail_photo, info_photo, reg_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)';
+                const input_data = [
+                    name,
+                    stock,
+                    price,
+                    category,
+                    prod_info,
+                    prod_feature,
+                    thumbnail_photo,
+                    info_photo,
+                    status,
+                ];
+
+                const [result1] = await dbcon.query(sql, input_data);
+                logger.info(JSON.stringify(result1));
+                // 새로 저장된 데이터의 PK값을 활용하여 다시 조회
+                const sql2 =
+                    'SELECT prod_id, name, stock, price, category, prod_info, prod_feature, thumbnail_photo, info_photo, reg_date FROM products WHERE prod_id=?';
+
+                const [result2] = await dbcon.query(sql2, [result1.insertId]);
+
+                // 조회결과를 미리 준비한 변수에 저장함
+                json = result2;
+            } catch (err) {
+                return next(err);
+            } finally {
+                dbcon.end();
+            }
+
+            // 모든 처리에 성공했으므로 정상 조회 결과 구성
+            res.sendJson({ item: json });
+        }
+    );
+
+    /** =-=-=-=-=-=-=-=-=-=-= router.PUT =-=-=-=-=-=-=-=-=-=-=  */
 
     /**
      * 관리자 페이지 - 일반 상품 관리 페이지
@@ -349,41 +353,6 @@ module.exports = (app) => {
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
         res.sendJson({ item: json });
     });
-    /**
-     * 관리자 페이지 - 일반 상품 관리 페이지
-     * 사용자 정보를 화면에 보여주는 데이터
-     * [DELETE] /products
-     */
-    /** 데이터 삭제 --> Delete(DELETE) */
-    router.delete('/products/:prod_id', async (req, res, next) => {
-        const prod_id = req.get('prod_id');
 
-        if (prod_id === undefined) {
-            return next(new Error(400));
-        }
-
-        /** 데이터 삭제하기 */
-        try {
-            // 데이터베이스 접속
-            dbcon = await mysql2.createConnection(config.database);
-            await dbcon.connect();
-
-            // 데이터 삭제하기
-            const sql = 'DELETE FROM products WHERE prod_id=?';
-            const [result1] = await dbcon.query(sql, [prod_id]);
-
-            // 결과 행 수가 0이라면 예외처리
-            if (result1.affectedRows < 1) {
-                throw new Error('삭제된 데이터가 없습니다.');
-            }
-        } catch (err) {
-            return next(err);
-        } finally {
-            dbcon.end();
-        }
-
-        // 모든 처리에 성공했으므로 정상 조회 결과 구성
-        res.sendJson();
-    });
     return router;
 };

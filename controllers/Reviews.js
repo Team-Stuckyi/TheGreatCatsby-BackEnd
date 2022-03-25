@@ -19,82 +19,9 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = (app) => {
-    fs.readdir('_files/uploads', (error) => {
-        // uploads 폴더 없으면 생성
-        if (error) {
-            fs.mkdirSync('_files/uploads');
-        }
-    });
-
-    const upload = multer({
-        storage: multer.diskStorage({
-            destination(req, file, cb) {
-                cb(null, '_files/uploads/');
-            },
-            filename(req, file, cb) {
-                const ext = path.extname(file.originalname);
-                cb(null, 'img' + Date.now() + ext);
-            },
-        }),
-        limits: { fileSize: 5 * 1024 * 1024 },
-    });
-
-    // router.post('/upload', upload.single('imgFile'), (req, res) => {
-    //     console.log(req.file);
-    //     res.json({ url: `/img/${req.file.filename}` });
-    // });
-
     let dbcon = null;
 
-    /*
-     * 관리자 페이지- 리뷰 관리 조회 페이지
-     * 사용자 페이지 - 상품 상세페이지, 구매 후기 페이지
-     * 리뷰 작성 정보를 화면에 보여주는 데이터
-     * [GET]
-     * admin => reviewlist.html
-     * user => prodlist.html. review.html
-     * 전송 정보 : user_id => users => name, email , prod_id => products =>name, stars, review_text, write_date, review_photo
-     */
-    router.get('/reviews/look', async (req, res, next) => {
-        //검색어 파라미터 받기 -> 검색어가 없을 경우 전체 목록 조회이므로 유효성 검사 안함
-        const query = req.get('query');
-
-        //현재 페이지 번호 받기 (기본값은 1)
-        const page = req.get('page', 1);
-
-        //한 페이지에 보여질 목록 수 받기 (기본값은 10, 최소 10, 최대 30)
-        const rows = req.get('rows', 10);
-        // 데이터 조회 결과가 저장될 빈 변수
-        let json = null;
-        let pagenation = null;
-
-        try {
-            // 데이터베이스 접속
-            dbcon = await mysql2.createConnection(config.database);
-            await dbcon.connect();
-
-            let sql1 =
-                "SELECT r.review_id, m.email, p.name, m.name, r.review_text, r.stars, DATE_FORMAT(r.write_date, '%Y-%m-%d') AS write_date, r.review_photo FROM reviews AS r LEFT JOIN orders AS o ON r.order_id = o.order_id LEFT JOIN members AS m ON o.user_id = m.user_id LEFT JOIN products p ON o.prod_id = p.prod_id;";
-
-            let args1 = [];
-
-            if (query != null) {
-                sql1 += " WHERE r.review_text LIKE ('%', ?, '%')";
-                args1.push(query);
-            }
-
-            const [result1] = await dbcon.query(sql1, args1);
-
-            // 조회 결과를 미리 준비한 변수에 저장함
-            json = result1;
-        } catch (err) {
-            return next(err);
-        } finally {
-            dbcon.end();
-        }
-        // 모든 처리에 성공했으므로 정상 조회 결과 구성
-        res.sendJson({ pagenation: pagenation, item: json });
-    });
+    /** =-=-=-=-=-=-=-=-=-=-= router.GET =-=-=-=-=-=-=-=-=-=-=  */
 
     /*
      * 관리자 페이지- 리뷰 관리 조회 페이지
@@ -160,12 +87,33 @@ module.exports = (app) => {
         res.sendJson({ item: json });
     });
 
+    /** =-=-=-=-=-=-=-=-=-=-= router.POST =-=-=-=-=-=-=-=-=-=-=  */
+
     /**
      * 사용자 페이지 - 구매 후기 페이지
      * 리뷰를 등록하는 데이터
      * [POST] /reviewlist.html
      * 전송 정보 : review_id, review_text, review_photo, stars,
      */
+    fs.readdir('_files/uploads', (error) => {
+        // uploads 폴더 없으면 생성
+        if (error) {
+            fs.mkdirSync('_files/uploads');
+        }
+    });
+
+    const upload = multer({
+        storage: multer.diskStorage({
+            destination(req, file, cb) {
+                cb(null, '_files/uploads/');
+            },
+            filename(req, file, cb) {
+                const ext = path.extname(file.originalname);
+                cb(null, 'img' + Date.now() + ext);
+            },
+        }),
+        limits: { fileSize: 5 * 1024 * 1024 },
+    });
 
     router.post('/reviews/write', upload.single('imgFile'), async (req, res, next) => {
         // 저장을 위한 파라미터 받기
@@ -210,6 +158,8 @@ module.exports = (app) => {
         // 모든 처리에 성공했으므로 정상 조회 결과 구성
         res.sendJson({ item: json });
     });
+
+    /** =-=-=-=-=-=-=-=-=-=-= router.DELETE =-=-=-=-=-=-=-=-=-=-=  */
 
     /**
      * 관리자 페이지 - 리뷰 관리 페이지
